@@ -147,6 +147,13 @@ sleep 10
 ssh -i $KEY_NAME.pem ubuntu@ec2-34-219-104-150.us-west-2.compute.amazonaws.com
 ```
 
+Once we're back in we need to set up the directory that will actually serve the API:
+
+```
+mkdir server
+cd server
+git clone https://github.com/throughput-ec/throughput_api.git
+```
 
 ## Configuring `neo4j`
 
