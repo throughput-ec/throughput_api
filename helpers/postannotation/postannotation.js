@@ -21,7 +21,7 @@ function postannotation (req, res) {
   CREATE (a:Annotation { created: timestamp() })
   MERGE (p:Person {id: {person}})
   MERGE (b:Object {value: {body}})
-  MERGE (c:Object {value: {target}})
+  MERGE (c:Object {url: {$target}})
   MERGE (p)-[:creates]-(a)-[:annotates]-(b)
   MERGE (a)-[:annotates]-(c)
   `

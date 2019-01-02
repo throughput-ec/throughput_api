@@ -121,6 +121,8 @@ We can then `ssh` in to the instance:
 ssh -i $KEY_NAME.pem ubuntu@ec2-34-219-104-150.us-west-2.compute.amazonaws.com
 ```
 
+At this point in time the remote instance is running, and files have been installed.
+
 ## Setting up the API
 
 We need to install some packages:
@@ -155,6 +157,47 @@ cd server
 git clone https://github.com/throughput-ec/throughput_api.git
 ```
 
+We also need to add a security rule for port 3000:
+
+```
+aws ec2 authorize-security-group-ingress --group-name $GROUP --protocol tcp --port 3000 --cidr 0.0.0.0/0
+```
+
+We also need to provide the proper credentials to the application.
+
+## Setting up the Git repository
+
+We set up `git` and `npm` on the remote server by tunnelling in through SSH and then installing node:
+
+```
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+```
+
+And installing git:
+
+```
+sudo apt install git
+```
+
+I set up a directory in the home folder for the applications (the Vue app and the Express API) and then clone from the remote directory.
+
+To run the app in the background I need to use `pm2`, which we can install using `npm`:
+
+```
+sudo npm install pm2 -g
+```
+
+Then, once `pm2` is installed we can start servingthe app using:
+
+```
+pm2 start app.js
+```
+
 ## Configuring `neo4j`
 
-The configuration files for Neo4j are found in `/etc/neo4j/neo4j.conf`.
+The configuration files for Neo4j are found in `/etc/neo4j/neo4j.conf`.  The installation is found in `/var/lib/neo4j`.  When I set up the EC2 server using the AMI image, and then updated everything I ran into an issue where the APOC plugins (in `/var/lib/neo4j/plugins`) were out of date for the current installation.  I needed to navigate to the proper directory and then:
+
+```
+```
+
+To allow the browser to accept the connection we need to add a security certificate to connect via HTTPS.  There is [good documentation by David Allen of neo4j for doing this](https://medium.com/neo4j/getting-certificates-for-neo4j-with-letsencrypt-a8d05c415bbd).
