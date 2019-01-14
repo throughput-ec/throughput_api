@@ -137,6 +137,18 @@ ssh -i $KEY_NAME.pem ubuntu@ec2-34-219-104-150.us-west-2.compute.amazonaws.com
 
 At this point in time the remote instance is running, and files have been installed.
 
+## Serving through the web
+
+To get a webserver started on the EC2 instance, use `nginx`:
+
+```
+sudo apt install nginx
+```
+
+This should be sufficient to start a server running on the remote server.  I mostly followed [this tutorial](https://hackernoon.com/tutorial-creating-and-managing-a-node-js-server-on-aws-part-2-5fbdea95f8a1), which got me going.
+
+I needed to update the hash in `/etc/nginx/nginx.conf` to set `server_names_hash_bucket_size: 128`.
+
 ## Setting up the API
 
 We need to install some packages:
@@ -158,6 +170,7 @@ This may involve updating the grub and `neo4j` configuration options.  I accepte
 Then exit and restart the server before `ssh`ing in again.
 
 ```
+export KEY_NAME="annotation_engine"
 aws ec2 reboot-instances --instance-ids "i-0f11e20dd0f288aed"
 sleep 10
 ssh -i $KEY_NAME.pem ubuntu@ec2-34-219-104-150.us-west-2.compute.amazonaws.com
@@ -204,14 +217,17 @@ sudo npm install pm2 -g
 Then, once `pm2` is installed we can start serving the app using:
 
 ```
-pm2 start app.js
+pm2 start npm --name "api" -- start
 ```
 
 ## Configuring `neo4j`
 
 The configuration files for Neo4j are found in `/etc/neo4j/neo4j.conf`.  The installation is found in `/var/lib/neo4j`.  When I set up the EC2 server using the AMI image, and then updated everything I ran into an issue where the APOC plugins (in `/var/lib/neo4j/plugins`) were out of date for the current installation.  I needed to navigate to the proper directory and then:
 
+One of the issues I ran into was not understanding that the default password for the neo4j instance was the EC2 Instance ID.  Once I got that I changed the password using a `curl` command:
+
 ```
+curl -H "Content-Type: application/json" -X POST -d '{"password":"NEW PASSWORD"}'  -u neo4j:i-0f11e20dd0f288aed http://127.0.0.1:7474/user/neo4j/password
 ```
 
 To allow the browser to accept the connection we need to add a security certificate to connect via HTTPS.  There is [good documentation by David Allen of neo4j for doing this](https://medium.com/neo4j/getting-certificates-for-neo4j-with-letsencrypt-a8d05c415bbd).
