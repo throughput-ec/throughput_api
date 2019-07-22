@@ -2,7 +2,7 @@
 
 # Annotation Engine neo4j API
 
-This application is designed to allow users to generate simple annotations of material using web-based resources.
+This application is designed to allow users to generate simple annotations of material using web-based resources based on the API protocols defined in the W3C standards.
 
 Annotations are generated as conformant to W3C annotation standards, and implemented using Neo4J.
 
