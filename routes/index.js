@@ -6,7 +6,7 @@ router.get('/', function(req, res) {
   res.render('index', { title: 'Annotation API Engine' });
 });
 
-router.get('/annotation', function(req, res) {
+router.get('/annotations', function(req, res) {
   var annotation = require('./../helpers/postannotation/postannotation.js');
   annotation.postannotation(req, res);
 })

@@ -12,9 +12,10 @@ function searchNodes(req, res) {
 
   passedKeys = Object.keys(req.query);
 
-  cypher = 'MATCH p=(n)-[*0..2]-(m)  \
+  cypher = 'MATCH p=(n)-[*0..3]-(m)  \
             WHERE n.url =~ {search} AND  \
-            LABELS(m) <> "Annotation" \
+              \
+            LABELS(m) <> "ANNOTATION" AND \
             n <> m RETURN p LIMIT {limit};'
 
   const session = driver.session();

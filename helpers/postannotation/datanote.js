@@ -32,7 +32,7 @@ function datanote (req, res) {
   }
 
   var body   = req.query.body;
-  var url    = req.query.url;
+  var url    = JSON.parse(req.query.url);
   var meta   = req.query.meta;
   var person = req.query.person;
 
