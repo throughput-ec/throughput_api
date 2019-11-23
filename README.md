@@ -1,4 +1,5 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![NSF-XXXXXXX](https://img.shields.io/badge/NSF-1928366-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1928366)
 
 # Annotation Engine neo4j API
 
@@ -42,7 +43,16 @@ This will ensure all the appropriate packages are downloaded and installed for t
 
 ## Endpoints
 
-Currently the following endpoints have been established:
-
-*   `POST person`:  Create a new person in the database using an ORCID
-*   `POST annotation`:  Link records within the database.
+### Cookbook
+* `ccdr`:
+  - `keyword`: Search research data resources by keyword
+  - `search`: Search for a research data resource by name
+  - `code`: (`True`/**`False`**) Return linked code repositories
+  - `summary`: (**`True`**/`False`) Return a summary of the linked code resources (number of repositories, number of sources)
+  - `limit`: [30] Maximum number of records to return.
+* `linked`:
+  - `keywords`: A json array of keywords: [['climate', 'weather'],['botany', 'plants']]
+  - `limit`: [30] Maximum number of records to return.
+* `friends`:
+  - `summary`: Number of unique users and number of annotations.
+  - `orcid`: Find unique annotator.

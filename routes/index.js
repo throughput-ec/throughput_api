@@ -11,6 +11,12 @@ router.get('/annotations', function(req, res) {
   annotation.postannotation(req, res);
 })
 
+router.get('/ccdr', function(req, res) {
+  var ccdr = require('./../helpers/ccdr/ccdr.js');
+  console.log(req.query)
+  ccdr.searchCcdrs(req, res);
+})
+
 router.get('/query', function(req, res) {
   var query = require('./../helpers/searchAnnotations/searchNodes.js');
   query.searchNodes(req, res);
