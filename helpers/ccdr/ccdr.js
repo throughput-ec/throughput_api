@@ -3,8 +3,6 @@ const neo4j = require('neo4j-driver').v1;
 
 var pwbin = require('./../../pwbin.json')
 
-console.log(pwbin);
-
 // Create Driver
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
@@ -35,7 +33,6 @@ function searchCcdrs(req, res) {
 
     const count = result.records.length;
     var db = '';
-    console.log(count)
 
     switch (count) {
       case 0:
@@ -48,33 +45,26 @@ function searchCcdrs(req, res) {
         break;
       case 1:
         db = result.records[0]._fields;
-
-        session.run(cypher, {search: db.name, limit: parseInt(req.query.limit)})
+        const sessionnew = driver.session();
+        sessionnew.run(cypher, {search: db[0], limit: parseInt(req.query.limit)})
           .then(repos => {
-            console.log(repos)
-            const links = repos.records.map(function(x) {
-              return {name: x._fields[0], description: x._fields[1], url: x._fields[2]}
+            const links = repos.records[0]._fields[3].map(function(x) {
+              return { name: x.name, description: x.description, url: x.url }
             });
-
+            
             res.status(200)
               .json({
                 status: 'success',
                 data: { count: count, database: db, repos: links },
                 message: 'Returned linked repositories.'
               });
-            });
+            })
+            .then(() => sessionnew.close());
         break;
       default:
         break;
 
     }
-
-    res.status(200)
-      .json({
-        status: 'success',
-        data: { count: count, database: db },
-        message: 'Returned linked repositories.'
-      });
 
   })
   .then(() => session.close());
