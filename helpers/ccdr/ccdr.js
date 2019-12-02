@@ -16,9 +16,9 @@ function searchCcdrs(req, res) {
                LIMIT {limit}'
 
   cypher = 'MATCH (n:OBJECT)-[:isType]-(:TYPE {type:"schema:DataCatalog"}) \
-            WHERE n.name = {search} \
+            WHERE n.name IN {search} \
             MATCH (o:OBJECT)-[:isType]-(:TYPE {type:"schema:CodeRepository"}) \
-            WITH n, o \
+            WITH n, o  \
             MATCH p=(n)-[]-(:ANNOTATION)-[:Target]-(o) \
             RETURN n.name, n.description, n.url, COLLECT({name:o.name, description:o.description, url:o.url}) \
             LIMIT {limit}'
@@ -27,52 +27,48 @@ function searchCcdrs(req, res) {
 
   /* First, try to find the database itself. */
 
-  session.run(cypher_db,
-    { search: req.query.search, limit: parseInt(req.query.limit) })
+  const aa = session.readTransaction(tx => tx.run(cypher_db,
+    { search: req.query.search, limit: parseInt(req.query.limit) }))
   .then(result => {
-
     const count = result.records.length;
     var db = '';
 
-    switch (count) {
-      case 0:
-        res.status(200)
-          .json({
-            status: 'success',
-            data: { count: 0, database: null, repos: null },
-            message: 'No databases match the supplied search string: ' + req.query.search
-          });
-        break;
-      case 1:
-        db = result.records[0]._fields;
+    if(count === 0) {
+      res.status(200)
+      .json({
+        status: 'success',
+        data: { count: 0, database: null, repos: null },
+        message: 'No databases match the supplied search string: ' + req.query.search
+      })
+    } else {
+        var data = result.records.map(x =>  x._fields[0] )
+
         const sessionnew = driver.session();
-        sessionnew.run(cypher, {search: db[0], limit: parseInt(req.query.limit)})
-          .then(repos => {
-            const links = repos.records[0]._fields[3].map(function(x) {
-              return { name: x.name, description: x.description, url: x.url }
-            });
-            
+
+        const repos = sessionnew.readTransaction(tx =>
+           tx.run(cypher, { search: data, limit: parseInt(req.query.limit) })
+        )
+        .then(repos => {
+          const links = repos.records.map(x => { return {
+            name: x._fields[0], description: x._fields[1],
+            url: x._fields[2],
+            repos: x._fields[3] }})
+          return(links)
+        })
+        .then(links => {
+          console.log(links)
             res.status(200)
-              .json({
-                status: 'success',
-                data: { count: count, database: db, repos: links },
-                message: 'Returned linked repositories.'
-              });
+            .json({
+              status: 'success',
+              data: { ccdrs: links },
+              message: 'Returned linked repositories.'
             })
-            .then(() => sessionnew.close());
-        break;
-      default:
-        break;
+        })
+
 
     }
 
-  })
-  .then(() => session.close());
-
-}
+    })
+  }
 
 module.exports.searchCcdrs = searchCcdrs;
-
-/*
-
-*/
