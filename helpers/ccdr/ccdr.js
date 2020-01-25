@@ -10,8 +10,26 @@ function searchCcdrs(req, res) {
 
   passedKeys = Object.keys(req.query);
 
-  cypher_db = 'MATCH (n:OBJECT)-[:isType]-(:TYPE {type:"schema:DataCatalog"}) \
-               WHERE toLower(n.name) CONTAINS toLower({search}) \
+  if(req.query.search === undefined) {
+    req.query.search = "";
+  }
+
+  if(req.query.keyword === undefined) {
+    req.query.keyword = "";
+  }
+
+  if(req.query.limit === undefined) {
+    req.query.limit = 15;
+  }
+
+  if(req.query.name === undefined) {
+    req.query.name = "";
+  }
+
+  cypher_db = 'MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type:"schema:DataCatalog"}) \
+               WHERE (toLower(n.name) CONTAINS toLower({name}) OR \
+                     toLower(n.description) CONTAINS toLower({search})) AND \
+                     toLower(k.keyword) CONTAINS tolower({keyword}) \
                RETURN n.name, n.description, n.url \
                LIMIT {limit}'
 
@@ -20,15 +38,17 @@ function searchCcdrs(req, res) {
             MATCH (o:OBJECT)-[:isType]-(:TYPE {type:"schema:CodeRepository"}) \
             WITH n, o  \
             MATCH p=(n)-[]-(:ANNOTATION)-[:Target]-(o) \
-            RETURN n.name, n.description, n.url, COLLECT({name:o.name, description:o.description, url:o.url}) \
-            LIMIT {limit}'
+            RETURN n.name, n.description, n.url, COLLECT({name:o.name, description:o.description, url:o.url})'
 
   const session = driver.session();
 
   /* First, try to find the database itself. */
 
   const aa = session.readTransaction(tx => tx.run(cypher_db,
-    { search: req.query.search, limit: parseInt(req.query.limit) }))
+    { search: req.query.search,
+      name: req.query.name,
+      limit: parseInt(req.query.limit),
+      keyword: req.query.keyword }))
   .then(result => {
     const count = result.records.length;
     var db = '';
@@ -49,6 +69,7 @@ function searchCcdrs(req, res) {
            tx.run(cypher, { search: data, limit: parseInt(req.query.limit) })
         )
         .then(repos => {
+          sessionnew.close()
           const links = repos.records.map(x => { return {
             name: x._fields[0], description: x._fields[1],
             url: x._fields[2],
@@ -56,7 +77,6 @@ function searchCcdrs(req, res) {
           return(links)
         })
         .then(links => {
-          console.log(links)
             res.status(200)
             .json({
               status: 'success',
@@ -64,7 +84,6 @@ function searchCcdrs(req, res) {
               message: 'Returned linked repositories.'
             })
         })
-
 
     }
 
