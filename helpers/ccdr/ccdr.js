@@ -26,19 +26,24 @@ function searchCcdrs(req, res) {
     req.query.name = "";
   }
 
-  cypher_db = 'MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type:"schema:DataCatalog"}) \
-               WHERE (toLower(n.name) CONTAINS toLower({name}) OR \
-                     toLower(n.description) CONTAINS toLower({search})) AND \
-                     toLower(k.keyword) CONTAINS tolower({keyword}) \
-               RETURN n.name, n.description, n.url \
-               LIMIT {limit}'
+  console.log(req.query)
 
-  cypher = 'MATCH (n:OBJECT)-[:isType]-(:TYPE {type:"schema:DataCatalog"}) \
-            WHERE n.name IN {search} \
-            MATCH (o:OBJECT)-[:isType]-(:TYPE {type:"schema:CodeRepository"}) \
-            WITH n, o  \
-            MATCH p=(n)-[]-(:ANNOTATION)-[:Target]-(o) \
-            RETURN n.name, n.description, n.url, COLLECT({name:o.name, description:o.description, url:o.url})'
+  cypher_db = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+               MATCH (o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+               WITH n, o, k \
+               MATCH p=(n)-[]-(:ANNOTATION)-[:Target]-(o) \
+               WHERE  \
+                 (toLower(n.name) CONTAINS toLower({name}) OR {name} = '') AND \
+                 (toLower(n.description) CONTAINS toLower({search}) OR {search} = '') AND \
+                 (toLower(k.keyword) CONTAINS toLower({keyword}) OR {keyword} = '') \
+               WITH DISTINCT n.name AS nameo \
+               LIMIT 20 \
+      	MATCH (m:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+                  WHERE m.name IN nameo \
+                  MATCH (o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+                  WITH m, o  \
+                  MATCH p=(m)-[]-(:ANNOTATION)-[:Target]-(o)  \
+                  RETURN m.name, m.description, m.url, COLLECT({name:o.name, description:o.description, url:o.url})"
 
   const session = driver.session();
 
@@ -51,6 +56,7 @@ function searchCcdrs(req, res) {
       keyword: req.query.keyword }))
   .then(result => {
     const count = result.records.length;
+    console.log(count)
     var db = '';
 
     if(count === 0) {
@@ -61,33 +67,23 @@ function searchCcdrs(req, res) {
         message: 'No databases match the supplied search string: ' + req.query.search
       })
     } else {
-        var data = result.records.map(x =>  x._fields[0] )
-
-        const sessionnew = driver.session();
-
-        const repos = sessionnew.readTransaction(tx =>
-           tx.run(cypher, { search: data, limit: parseInt(req.query.limit) })
-        )
-        .then(repos => {
-          sessionnew.close()
-          const links = repos.records.map(x => { return {
-            name: x._fields[0], description: x._fields[1],
-            url: x._fields[2],
-            repos: x._fields[3] }})
-          return(links)
-        })
-        .then(links => {
-            res.status(200)
-            .json({
-              status: 'success',
-              data: { ccdrs: links },
-              message: 'Returned linked repositories.'
-            })
-        })
-
+      console.log(result.records)
+      output = result.records.map(function(x) {
+        return {name: x['_fields'][0],
+                description: x['_fields'][1],
+                url: x['_fields'][2],
+                repos: x['_fields'][3]} })
+      res.status(200)
+      .json({
+        status: 'success',
+        data: { ccdrs: output },
+        message: 'Returned linked repositories.'
+      })
     }
-
-    })
-  }
+  })
+  .catch(function(err) {
+    console.error(error);
+  })
+}
 
 module.exports.searchCcdrs = searchCcdrs;

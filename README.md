@@ -1,7 +1,7 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![NSF-XXXXXXX](https://img.shields.io/badge/NSF-1928366-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1928366)
+[![NSF-1928366](https://img.shields.io/badge/NSF-1928366-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1928366)
 
-# Annotation Engine neo4j API
+# Annotation Engine `neo4j` API
 
 This application is designed to allow users to generate simple annotations of material using web-based resources based on the API protocols defined in the W3C standards.
 
@@ -40,6 +40,10 @@ npm install
 ```
 
 This will ensure all the appropriate packages are downloaded and installed for the project.
+
+### Running the Application
+
+Once `neo4j` and the node/express setup is complete the application can be run using `nodemon`.
 
 ## Endpoints
 
