@@ -23,9 +23,9 @@ router.get('/repo', function(req, res) {
   ccdr.searchRepo(req, res);
 })
 
-router.get('/query', function(req, res) {
-  var query = require('./../helpers/searchAnnotations/searchNodes.js');
-  query.searchNodes(req, res);
+router.get('/keyword', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.keywords(req, res);
 })
 
 router.post('/datanote', function(req, res) {
