@@ -41,8 +41,8 @@ function keywords(req, res) {
                   WHERE  \
                   toLower(k.keyword) CONTAINS toLower({keyword}) AND \
                   t.type IN ['schema:CodeRepository','schema:DataCatalog'] \
-                  WITH DISTINCT toLower(k.keyword) AS keyword, t.type, COLLECT({name: o.name, url: o.url}) AS reps \
-                  RETURN keyword, reps \
+                  WITH DISTINCT toLower(k.keyword) AS keyword, t.type AS type, COLLECT({name: o.name, url: o.url}) AS reps \
+                  RETURN keyword, type, reps \
                   ORDER BY SIZE (reps) DESC \
                   SKIP {offset} \
                   LIMIT {limit}"
@@ -82,9 +82,8 @@ function keywords(req, res) {
           output = { keyword: x['_fields'][0], count: Math.max(x['_fields'][1]) }
         } else {
           output = { keyword: x['_fields'][0],
-                     name: x['_fields'][1],
-                     url: x['_fields'][2],
-                     type: x['_fields'][2] }
+                     type: x['_fields'][1],
+                     resources: x['_fields'][2] }
         }
 
         return  output })

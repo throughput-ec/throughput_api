@@ -89,8 +89,6 @@ function searchRepo(req, res) {
 
       output = result.records.map(function(x) {
 
-        repohit =
-
         return {name: x['_fields'][0],
                 description: x['_fields'][1],
                 url: x['_fields'][2],
