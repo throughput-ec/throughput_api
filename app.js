@@ -19,7 +19,7 @@ app.use(cors());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(favicon()); 
+app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -64,7 +64,7 @@ app.post("/webhooks/github", function (req, res) {
   var sender = req.body.sender;
   var branch = req.body.ref;
 
-  if(branch.indexOf('master') > -1 && sender.login === 'throughput-ec'){
+  if(branch.indexOf('master') > -1 && organization.login === 'throughput-ec'){
       deploy(res);
   }
 })
