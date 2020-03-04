@@ -91,7 +91,7 @@ function searchCcdrs(req, res) {
         return {name: x['_fields'][0],
                 description: x['_fields'][1],
                 url: x['_fields'][2],
-                repos: x['_fields'][3]} })
+                repos: Math.max(x['_fields'][3])} })
       res.status(200)
       .json({
         status: 'success',
