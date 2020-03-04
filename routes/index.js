@@ -17,6 +17,12 @@ router.get('/ccdr', function(req, res) {
   ccdr.searchCcdrs(req, res);
 })
 
+router.get('/repo', function(req, res) {
+  var ccdr = require('./../helpers/searchRepo/coderepo.js');
+  console.log(req.query)
+  ccdr.searchRepo(req, res);
+})
+
 router.get('/query', function(req, res) {
   var query = require('./../helpers/searchAnnotations/searchNodes.js');
   query.searchNodes(req, res);
