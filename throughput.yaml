@@ -1,0 +1,204 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+servers:
+  - description: Throughput Database API
+    url: http://throughputdb.com/api
+info:
+  description: API for connecting data resources to research products.
+  version: "1.0.0"
+  title: Throughput API
+  contact:
+    email: goring@wisc.edu
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: databases
+    description: Calls to return information about databases.
+  - name: repos
+    description: Calls to return information about code repositories.
+  - name: stats
+    description: Database statistics.
+paths:
+  /metrics/annos:
+    get:
+      tags:
+        - stats
+      summary: Return summary information about the number of annotations generated.
+      responses:
+        '200':
+          description: Summary of weekly uploads/updates.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/annos'
+        '400':
+          description: bad input parameter
+  /ccdr:
+    get:
+      tags:
+        - databases
+      summary: searches for a data resource ('schema:DataCatalog')
+      operationId: searchDb
+      description: |
+        Passing terms in to search for keywords, subject matter or descriptions associated with data resources on the web.
+      parameters:
+        - in: query
+          name: name
+          description: Pass an optional search string for looking up a data resource by name.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: search
+          description: Pass an optional search string for looking up a data resource through context.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keyword
+          description: Pass an optional search string for looking up a data resource by registered keyword.
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: Maximum number of records to return.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+        - in: query
+          name: offset
+          description: Number of records to skip.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ccdr'
+        '400':
+          description: bad input parameter
+  /repo:
+    get:
+      tags:
+        - databases
+      summary: searches for a data resource ('schema:CodeRepository')
+      operationId: searchRepo
+      description: |
+        Passing terms in to search for keywords, subject matter or descriptions associated with code resources on the web.
+      parameters:
+        - in: query
+          name: name
+          description: Pass an optional search string for looking up a code resource by name.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: search
+          description: Pass an optional search string for looking up a code resource through context.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keyword
+          description: Pass an optional search string for looking up a code resource by registered keyword.
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: Maximum number of records to return.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+        - in: query
+          name: offset
+          description: Number of records to skip.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/repo'
+        '400':
+          description: bad input parameter
+components:
+  schemas:
+    repo:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - url
+        - repos
+      properties:
+        id:
+          type: string
+          example: ''
+        name:
+          type: string
+          example: 'jupyter/repo2docker'
+        url:
+          type: string
+          format: url
+          example: 'https://github.com/jupyter/repo2docker'
+    ccdr:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - url
+        - repos
+      properties:
+        id:
+          type: string
+          example: 'r3d100011761'
+        name:
+          type: string
+          example: 'Neotoma Paleoecology Database'
+        description:
+          type: string
+          example: 'Neotoma is a multiproxy paleoecological database that covers the Pliocene-Quaternary, including modern microfossil samples. . .'
+        url:
+          type: string
+          format: url
+          example: 'https://www.neotomadb.org/'
+        repos:
+          type: integer
+          example: 13
+    annos:
+      type: object
+      required:
+        - year
+        - week
+        - annotations
+      properties:
+        year:
+          type: integer
+          example: 2019
+        week:
+          type: integer
+          example: 3
+        annotations:
+          type: integer
+          example: 67012

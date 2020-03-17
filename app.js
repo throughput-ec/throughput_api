@@ -1,19 +1,48 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
-var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 var bodyParser = require('body-parser');
 var cors = require('cors');
+const YAML = require('yamljs');
+var fs = require('fs');
+var swaggerUi = require('swagger-ui-express'),
+    swaggerDocument = YAML.load('./throughput.yaml');
+
+var app = express();
+
+app.use(cors());
+
+// create a write stream (in append mode)
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'),
+{
+    flags: 'a'
+})
+
+// setup the logger
+app.use(logger(':date[iso]\t:remote-addr\t:method\t:url\t:status\t:res[content-length]\t:response-time[0]\t:user-agent',
+{
+    stream: accessLogStream
+}))
+
+
+const OpenApiValidator = require('express-openapi-validator').OpenApiValidator;
+
+// 3. (optionally) Serve the OpenAPI spec
+const spec = path.join(__dirname, 'throughput.yaml');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var debug = require('debug')('app4')
 
-var app = express();
+var options = {
+    swaggerUrl: 'http://localhost:3000/api-docs',
+    customCssUrl: '/custom.css'
+}
 
-app.use(cors());
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,17 +86,17 @@ if (app.get('env') === 'development')
     });
 }
 
-// production error handler
-// no stacktraces leaked to user
+// error handler
 app.use(function (err, req, res, next)
 {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err :
+    {};
+
+    // render the error page
     res.status(err.status || 500);
-    res.render('error',
-    {
-        message: err.message,
-        error:
-        {}
-    });
+    res.render('error');
 });
 
 app.all('*', function (req, res)
@@ -75,33 +104,4 @@ app.all('*', function (req, res)
     res.redirect('/api-docs');
 });
 
-app.post("/webhooks/github", function (req, res)
-{
-    var sender = req.body.sender;
-    var branch = req.body.ref;
-
-    if (branch.indexOf('master') > -1 && organization.login === 'throughput-ec')
-    {
-        deploy(res);
-    }
-})
-
-function deploy(res)
-{
-    childProcess.exec('cd /home && ./deploy.sh', function (err, stdout, stderr)
-    {
-        if (err)
-        {
-            console.error(err);
-            return res.send(500);
-        }
-        res.send(200);
-    });
-}
-
-app.set('port', process.env.PORT || 3000)
-
-var server = app.listen(app.get('port'), function ()
-{
-    debug('Express server listening on port ' + server.address().port)
-})
+app.listen(3000)
