@@ -29,6 +29,12 @@ router.get('/api/metrics/type', function (req, res)
     metrics.nodesByType(req, res);
 })
 
+router.get('/api/metrics/annos/users', function (req, res)
+{
+    var metrics = require('./../helpers/metrics/metrics.js');
+    metrics.topUsers(req, res);
+})
+
 router.get('/api/metrics/annos', function (req, res)
 {
     var metrics = require('./../helpers/metrics/metrics.js');
