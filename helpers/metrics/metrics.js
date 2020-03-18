@@ -47,6 +47,67 @@ function nodesByType(req, res)
 
 }
 
+function topUsers(req, res)
+{
+
+
+    passedKeys = Object.keys(req.query);
+
+    if (req.query.limit === undefined)
+    {
+        req.query.limit = 15;
+    }
+
+    if (req.query.offset === undefined)
+    {
+        req.query.offset = 0;
+    }
+
+    console.log(req.query)
+
+    annos = "MATCH (n:ANNOTATION)-[:Created]-(a:AGENT)-[:isAgentType]-(:AGENTTYPE {type:'Person'}) \
+             RETURN distinct a.name  AS person, a.id AS identifier, COUNT(n) AS count \
+             ORDER BY count DESC \
+             SKIP {offset} \
+             LIMIT {limit}"
+
+    const session = driver.session();
+
+    const aa = session.readTransaction(tx => tx.run(annos,
+        {
+            offset: req.query.offset,
+            limit: req.query.limit
+        }))
+        .then(result =>
+        {
+            console.log(result.records)
+            var output = result.records.map(x =>
+            {
+                return (
+                {
+                    person: x._fields[0],
+                    id: x._fields[1],
+                    count: Math.max(x._fields[2])
+                })
+            })
+            res.status(200)
+                .json(
+                {
+                    status: 'success',
+                    data:
+                    {
+                        counts: output
+                    },
+                    message: 'Results.'
+                })
+
+        })
+        .catch(function (err)
+        {
+            console.error(err);
+        })
+
+}
 
 function totalAnnot(req, res)
 {
@@ -94,3 +155,4 @@ function totalAnnot(req, res)
 
 module.exports.nodesByType = nodesByType;
 module.exports.totalAnnot = totalAnnot;
+module.exports.topUsers = topUsers;
