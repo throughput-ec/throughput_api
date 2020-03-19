@@ -1,7 +1,15 @@
 {
-  "name": "application-name",
+  "name": "Throughput DB API",
   "version": "0.0.1",
+  "homepage": "http://github.com/throughput-ec/throughput_api",
+  "license": "(MIT OR Apache-2.0)",
+  "description": "An express API service to return data from the Throughput annotation database through a web-accessible service.",
+  "keywords": ["NSF", "GitHub", "Annotation", "API", "neo4j"],
   "private": true,
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/throughput-ec/throughput_api.git"
+  },
   "scripts": {
     "start": "node app.js"
   },
