@@ -55,6 +55,12 @@ router.get('/api/keyword', function (req, res)
     query.keywords(req, res);
 })
 
+router.get('/api/keyword/all', function (req, res)
+{
+    var query = require('./../helpers/keywords/keywords.js');
+    query.allkeywords(req, res);
+})
+
 router.post('/api/datanote', function (req, res)
 {
     var notes = require('./../helpers/postannotation/datanote.js');
