@@ -38,7 +38,7 @@ var users = require('./routes/users');
 var debug = require('debug')('app4')
 
 var options = {
-    swaggerUrl: 'http://localhost:3000/api-docs',
+    swaggerUrl: 'http://0.0.0.0:3000/api-docs',
     customCssUrl: '/custom.css'
 }
 
