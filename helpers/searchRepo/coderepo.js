@@ -43,26 +43,26 @@ function searchRepo(req, res)
 
     cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
                   WHERE  \
-                  (toLower(n.name) CONTAINS toLower({name}) OR {name} = '') AND \
-                  (toLower(n.description) CONTAINS toLower({search}) OR {search} = '') \
+                  (toLower(n.name) CONTAINS toLower($name) OR $name = '') AND \
+                  (toLower(n.description) CONTAINS toLower($search) OR $search = '') \
                   WITH DISTINCT n \
                   OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
                   RETURN DISTINCT ID(n), n.name AS name, n.description AS description, n.url AS url, SIZE(COLLECT(o)) AS dbs \
                   ORDER BY dbs DESC \
-                  SKIP {offset} \
-                  LIMIT {limit}"
+                  SKIP toInteger(offset) \
+                  LIMIT toInteger(limit)"
 
     cypher_db_kw = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
                   WHERE  \
-                  (toLower(n.name) CONTAINS toLower({name}) OR {name} = '') AND \
-                  (toLower(n.description) CONTAINS toLower({search}) OR {search} = '') AND \
-                  (toLower(k.keyword)) CONTAINS toLower({keyword}) \
+                  (toLower(n.name) CONTAINS toLower($name) OR $name = '') AND \
+                  (toLower(n.description) CONTAINS toLower($search) OR $search = '') AND \
+                  (toLower(k.keyword)) CONTAINS toLower($keyword) \
                   WITH DISTINCT n \
                   OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
                   RETURN DISTINCT ID(n), n.name AS name, n.description AS description, n.url AS url, toInteger(SIZE(COLLECT(o))) AS dbs \
                   ORDER BY dbs DESC \
-                  SKIP {offset} \
-                  LIMIT {limit}"
+                  SKIP toInteger(offset) \
+                  LIMIT toInteger(limit)"
 
     const session = driver.session();
 

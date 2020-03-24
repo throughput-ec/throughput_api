@@ -6,6 +6,84 @@ var pwbin = require('./../../pwbin.json')
 // Create Driver
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
+function reposbykw(req, res)
+{
+
+    passedKeys = Object.keys(req.query);
+
+    if (req.query.keywords === undefined)
+    {
+        req.query.keywords = "";
+    }
+    else
+    {
+        req.query.keywords = req.query.keywords.split(',')
+    }
+
+    if (req.query.limit === undefined)
+    {
+        req.query.limit = 15;
+    }
+
+    if (req.query.offset === undefined)
+    {
+        req.query.offset = 0;
+    }
+
+    query = " MATCH(k: KEYWORD) \
+    WHERE k.keyword IN $keywords \
+    WITH k \
+    MATCH(t: TYPE)-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
+    WHERE o.id IS NOT NULL \
+    RETURN o.id AS id, \
+         o.name AS name, \
+  o.description AS description, \
+         t.type AS type, \
+      k.keyword AS keyword"
+
+    const session = driver.session();
+
+    /* First, try to find the database itself. */
+
+    const aa = session.readTransaction(tx => tx.run(query,
+        {
+            limit: parseInt(req.query.limit),
+            offset: parseInt(req.query.offset),
+            keywords: req.query.keywords
+        }))
+        .then(result =>
+        {
+            console.log(result.records)
+
+            output = result.records.map(function (x)
+            {
+                var sampler = {}
+
+                for (i = 0; i < x._fields.length; i++)
+                {
+                    sampler[x.keys[i]] = x._fields[i]
+                }
+
+                return (sampler)
+            })
+
+            res.status(200)
+                .json(
+                {
+                    status: 'success',
+                    data:
+                    {
+                        keywords: output
+                    },
+                    message: 'Returned linked repositories.'
+                })
+        })
+        .catch(function (err)
+        {
+            console.error(err);
+        })
+}
+
 function keywords(req, res)
 {
 
@@ -26,17 +104,15 @@ function keywords(req, res)
         req.query.offset = 0;
     }
 
-    console.log(req.query)
-
     cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(t:TYPE) \
                  WHERE t.type IN ['schema:CodeRepository', 'schema:DataCatalog'] AND \
-                 toLower(k.keyword) CONTAINS toLower({keyword}) \
+                 toLower(k.keyword) CONTAINS toLower($keyword) \
                  WITH o \
                  MATCH (o)-[]-(:ANNOTATION)-[]-(a:KEYWORD) \
                  RETURN DISTINCT toLower(a.keyword) AS keyword, COUNT(toLower(a.keyword)) AS resources \
                  ORDER BY repos DESC \
-                 SKIP {offset} \
-                 LIMIT {limit}"
+                 SKIP $offset \
+                 LIMIT $limit"
 
     const session = driver.session();
 
@@ -116,7 +192,6 @@ function allkeywords(req, res)
                     message: 'Returned linked repositories.'
                 })
         })
-        .then(x => driver.close())
         .catch(function (err)
         {
             console.error(err);
@@ -125,3 +200,4 @@ function allkeywords(req, res)
 
 module.exports.keywords = keywords;
 module.exports.allkeywords = allkeywords;
+module.exports.reposbykw = reposbykw;

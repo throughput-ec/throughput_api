@@ -102,6 +102,7 @@ function connectedRepos(req, res)
                 })
 
         })
+        .then(x => driver.close())
         .catch(function (err)
         {
             console.error(err);
@@ -164,6 +165,7 @@ function topUsers(req, res)
                 })
 
         })
+        .then(x => driver.close())
         .catch(function (err)
         {
             console.error(err);
@@ -207,6 +209,7 @@ function totalAnnot(req, res)
                 })
 
         })
+        .then(x => driver.close())
         .catch(function (err)
         {
             console.error(err);
