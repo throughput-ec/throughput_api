@@ -26,46 +26,23 @@ function keywords(req, res)
         req.query.offset = 0;
     }
 
-    if (req.query.stat === undefined)
-    {
-        req.query.stat = true;
-    }
-
     console.log(req.query)
 
     cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(t:TYPE) \
-                  WHERE  \
-                  toLower(k.keyword) CONTAINS toLower({keyword}) AND \
-                  t.type IN ['schema:CodeRepository','schema:DataCatalog'] \
-                  RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(o) AS results \
-                  ORDER BY results DESC \
-                  SKIP {offset} \
-                  LIMIT {limit}"
-
-    cypher_ns = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(t:TYPE) \
-                  WHERE  \
-                  toLower(k.keyword) CONTAINS toLower({keyword}) AND \
-                  t.type IN ['schema:CodeRepository','schema:DataCatalog'] \
-                  WITH DISTINCT toLower(k.keyword) AS keyword, t.type AS type, COLLECT({name: o.name, url: o.url}) AS reps \
-                  RETURN keyword, type, reps \
-                  ORDER BY SIZE (reps) DESC \
-                  SKIP {offset} \
-                  LIMIT {limit}"
+                 WHERE t.type IN ['schema:CodeRepository', 'schema:DataCatalog'] AND \
+                 toLower(k.keyword) CONTAINS toLower({keyword}) \
+                 WITH o \
+                 MATCH (o)-[]-(:ANNOTATION)-[]-(a:KEYWORD) \
+                 RETURN DISTINCT toLower(a.keyword) AS keyword, COUNT(toLower(a.keyword)) AS resources \
+                 ORDER BY repos DESC \
+                 SKIP {offset} \
+                 LIMIT {limit}"
 
     const session = driver.session();
 
-    if (req.query.stat == true)
-    {
-        queryCall = cypher_st;
-    }
-    else
-    {
-        queryCall = cypher_ns;
-    }
-
     /* First, try to find the database itself. */
 
-    const aa = session.readTransaction(tx => tx.run(queryCall,
+    const aa = session.readTransaction(tx => tx.run(cypher_st,
         {
             limit: parseInt(req.query.limit),
             offset: parseInt(req.query.offset),
@@ -73,198 +50,71 @@ function keywords(req, res)
         }))
         .then(result =>
         {
-            const count = result.records.length;
-            console.log(count)
-            var db = '';
-
-            if (count === 0)
-            { // Require Neo4j
-                const neo4j = require('neo4j-driver').v1;
-
-                var pwbin = require('./../../pwbin.json')
-
-                // Create Driver
-                const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
-
-                function keywords(req, res)
-                {
-
-                    passedKeys = Object.keys(req.query);
-
-                    if (req.query.keyword === undefined)
-                    {
-                        req.query.keyword = "";
-                    }
-
-                    if (req.query.limit === undefined)
-                    {
-                        req.query.limit = 15;
-                    }
-
-                    if (req.query.offset === undefined)
-                    {
-                        req.query.offset = 0;
-                    }
-
-                    if (req.query.stat === undefined)
-                    {
-                        req.query.stat = true;
-                    }
-
-                    console.log(req.query)
-
-                    cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(t:TYPE) \
-                  WHERE  \
-                  toLower(k.keyword) CONTAINS toLower({keyword}) AND \
-                  t.type IN ['schema:CodeRepository','schema:DataCatalog'] \
-                  RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(o) AS results \
-                  ORDER BY results DESC \
-                  SKIP {offset} \
-                  LIMIT {limit}"
-
-                    cypher_ns = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(t:TYPE) \
-                  WHERE  \
-                  toLower(k.keyword) CONTAINS toLower({keyword}) AND \
-                  t.type IN ['schema:CodeRepository','schema:DataCatalog'] \
-                  WITH DISTINCT toLower(k.keyword) AS keyword, t.type AS type, COLLECT({name: o.name, url: o.url}) AS reps \
-                  RETURN keyword, type, reps \
-                  ORDER BY SIZE (reps) DESC \
-                  SKIP {offset} \
-                  LIMIT {limit}"
-
-                    const session = driver.session();
-
-                    if (req.query.stat == true)
-                    {
-                        queryCall = cypher_st;
-                    }
-                    else
-                    {
-                        queryCall = cypher_ns;
-                    }
-
-                    /* First, try to find the database itself. */
-
-                    const aa = session.readTransaction(tx => tx.run(queryCall,
-                        {
-                            limit: parseInt(req.query.limit),
-                            offset: parseInt(req.query.offset),
-                            keyword: req.query.keyword
-                        }))
-                        .then(result =>
-                        {
-                            const count = result.records.length;
-                            console.log(count)
-                            var db = '';
-
-                            if (count === 0)
-                            {
-                                res.status(200)
-                                    .json(
-                                    {
-                                        status: 'success',
-                                        data:
-                                        {
-                                            count: 0,
-                                            database: null,
-                                            repos: null
-                                        },
-                                        message: 'No keywords match the supplied search string: ' + req.query.search
-                                    })
-                            }
-                            else
-                            {
-                                console.log(result.records)
-
-                                output = result.records.map(function (x)
-                                {
-
-                                    if (x['keys'].includes('results'))
-                                    {
-                                        output = {
-                                            keyword: x['_fields'][0],
-                                            count: Math.max(x['_fields'][1])
-                                        }
-                                    }
-                                    else
-                                    {
-                                        output = {
-                                            keyword: x['_fields'][0],
-                                            type: x['_fields'][1],
-                                            resources: x['_fields'][2]
-                                        }
-                                    }
-
-                                    return output
-                                })
-                                res.status(200)
-                                    .json(
-                                    {
-                                        status: 'success',
-                                        data:
-                                        {
-                                            ccdrs: output
-                                        },
-                                        message: 'Returned linked repositories.'
-                                    })
-                            }
-                        })
-                        .catch(function (err)
-                        {
-                            console.error(err);
-                        })
+            output = result.records.map(function (x)
+            {
+                sampler = {
+                    [x.keys[0]]: x._fields[0],
+                    [x.keys[1]]: Math.max(x._fields[1])
                 }
 
-                module.exports.keywords = keywords;
-                res.status(200)
-                    .json(
-                    {
-                        status: 'success',
-                        data:
-                        {
-                            count: 0,
-                            database: null,
-                            repos: null
-                        },
-                        message: 'No keywords match the supplied search string: ' + req.query.search
-                    })
-            }
-            else
-            {
-                console.log(result.records)
+                return (sampler)
+            })
 
-                output = result.records.map(function (x)
+            res.status(200)
+                .json(
                 {
-
-                    if (x['keys'].includes('results'))
+                    status: 'success',
+                    data:
                     {
-                        output = {
-                            keyword: x['_fields'][0],
-                            count: Math.max(x['_fields'][1])
-                        }
-                    }
-                    else
-                    {
-                        output = {
-                            keyword: x['_fields'][0],
-                            type: x['_fields'][1],
-                            resources: x['_fields'][2]
-                        }
-                    }
-
-                    return output
+                        keywords: output
+                    },
+                    message: 'Returned linked repositories.'
                 })
-                res.status(200)
-                    .json(
-                    {
-                        status: 'success',
-                        data:
-                        {
-                            ccdrs: output
-                        },
-                        message: 'Returned linked repositories.'
-                    })
-            }
+        })
+        .catch(function (err)
+        {
+            console.error(err);
+        })
+}
+
+function allkeywords(req, res)
+{
+
+
+    console.log(req.query)
+
+    cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION) \
+                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
+                 ORDER BY links DESC"
+
+    const session = driver.session();
+
+    /* First, try to find the database itself. */
+
+    const aa = session.readTransaction(tx => tx.run(cypher_st,
+        {
+            limit: parseInt(req.query.limit),
+            offset: parseInt(req.query.offset),
+            keyword: req.query.keyword
+        }))
+        .then(result =>
+        {
+            output = result.records.map(function (x)
+            {
+                sampler = {
+                    [x.keys[0]]: x._fields[0],
+                    [x.keys[1]]: Math.max(x._fields[1])
+                }
+                return (sampler)
+            })
+
+            res.status(200)
+                .json(
+                {
+                    status: 'success',
+                    data: output,
+                    message: 'Returned linked repositories.'
+                })
         })
         .catch(function (err)
         {
@@ -273,3 +123,4 @@ function keywords(req, res)
 }
 
 module.exports.keywords = keywords;
+module.exports.allkeywords = allkeywords;
