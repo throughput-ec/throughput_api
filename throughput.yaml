@@ -36,6 +36,46 @@ paths:
                   $ref: '#/components/schemas/annos'
         '400':
           description: bad input parameter
+  /keyword/resources:
+    get:
+      tags:
+        - databases
+      summary: Pulls data resources by keywords.
+      description: |
+        Pass a comma separated list of keywords and return the databases that match those keywords.
+      parameters:
+        - in: query
+          name: keyword
+          description: A comma separated list of keywords in the database.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: Maximum number of records to return.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+        - in: query
+          name: offset
+          description: Number of records to skip.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/kwreturn'
+        '400':
+          description: bad input parameter
   /ccdr:
     get:
       tags:
@@ -255,3 +295,30 @@ components:
         annotations:
           type: integer
           example: 67012
+    kwreturn:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - type
+        - keyword
+      properties:
+        id:
+          type: string
+          example: 'r3d100000002'
+        name:
+          type: string
+          example: 'Access to Archival Databases'
+        description:
+          type: string
+          example: 'Access to Archival Databases'
+        type:
+          type: string
+          example: 'schema:DataCatalog'
+        links:
+          type: integer
+          example: 5
+        keyword:
+          type: string
+          example: 'us history'
