@@ -31,7 +31,7 @@
     "fs": "0.0.1-security",
     "jade": "^1.11.0",
     "morgan": "^1.9.1",
-    "neo4j-driver": "^1.7.6",
+    "neo4j-driver": "^4.0.2",
     "qs": "^6.9.1",
     "static-favicon": "~1.0.0",
     "swagger-ui-express": "^4.1.3",

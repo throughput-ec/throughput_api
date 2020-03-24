@@ -1,5 +1,5 @@
 // Require Neo4j
-const neo4j = require('neo4j-driver').v1;
+const neo4j = require('neo4j-driver');
 
 var pwbin = require('./../../pwbin.json')
 
@@ -116,6 +116,7 @@ function allkeywords(req, res)
                     message: 'Returned linked repositories.'
                 })
         })
+        .then(x => driver.close())
         .catch(function (err)
         {
             console.error(err);

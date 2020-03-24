@@ -19,7 +19,6 @@ router.get('/api/annotations', function (req, res)
 router.get('/api/ccdr', function (req, res)
 {
     var ccdr = require('./../helpers/ccdr/ccdr.js');
-    console.log(req.query)
     ccdr.searchCcdrs(req, res);
 })
 
@@ -45,7 +44,6 @@ router.get('/api/metrics/annos', function (req, res)
 router.get('/api/repo', function (req, res)
 {
     var ccdr = require('./../helpers/searchRepo/coderepo.js');
-    console.log(req.query)
     ccdr.searchRepo(req, res);
 })
 
