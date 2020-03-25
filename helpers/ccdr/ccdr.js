@@ -137,4 +137,100 @@ function searchCcdrs(req, res)
         })
 }
 
+function ccdrLinks(req, res)
+{
+
+    passedKeys = Object.keys(req.query);
+
+    if (req.query.limit === undefined)
+    {
+        req.query.limit = 15;
+    }
+
+    if (req.query.id === undefined)
+    {
+        req.query.name = "";
+    }
+
+    if (req.query.offset === undefined)
+    {
+        req.query.offset = 0;
+    }
+
+    console.log(req.query)
+
+
+    cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+                 WHERE  toLower(n.id) CONTAINS toLower($id) \
+                  WITH n \
+                  MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+                  RETURN o.id, o.name, o.description, o.url \
+                  SKIP toInteger($offset) \
+                  LIMIT toInteger($limit)"
+
+    const session = driver.session();
+
+    /* First, try to find the database itself. */
+
+    const aa = session.readTransaction(tx => tx.run(cypher_db,
+        {
+            id: req.query.id,
+            limit: parseInt(req.query.limit),
+            offset: parseInt(req.query.offset)
+        }))
+        .then(result =>
+        {
+            const count = result.records.length;
+            console.log(count)
+            var db = '';
+
+            if (count === 0)
+            {
+                res.status(200)
+                    .json(
+                    {
+                        status: 'success',
+                        data:
+                        {
+                            count: 0,
+                            database: null,
+                            repos: null
+                        },
+                        message: 'No databases match the supplied search string: ' + req.query.search
+                    })
+            }
+            else
+            {
+                console.log(result.records)
+
+                output = result.records.map(function (x)
+                {
+                    return {
+                        id: x['_fields'][0],
+                        name: x['_fields'][1],
+                        description: x['_fields'][2],
+                        url: x['_fields'][3]
+                    }
+                })
+                res.status(200)
+                    .json(
+                    {
+                        status: 'success',
+                        data:
+                        {
+                            ccdrs: output
+                        },
+                        message: 'Returned linked repositories.'
+                    })
+            }
+        })
+        .then(x => driver.close())
+        .catch(function (err)
+        {
+            console.error(err);
+        })
+
+}
+
 module.exports.searchCcdrs = searchCcdrs;
+module.exports.ccdrLinks = ccdrLinks;

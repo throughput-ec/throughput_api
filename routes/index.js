@@ -22,6 +22,12 @@ router.get('/api/ccdr', function (req, res)
     ccdr.searchCcdrs(req, res);
 })
 
+router.get('/api/linked', function (req, res)
+{
+    var ccdr = require('./../helpers/ccdr/ccdr.js');
+    ccdr.ccdrLinks(req, res);
+})
+
 router.get('/api/metrics/type', function (req, res)
 {
     var metrics = require('./../helpers/metrics/metrics.js');
