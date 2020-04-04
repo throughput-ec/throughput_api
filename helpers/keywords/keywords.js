@@ -24,8 +24,7 @@ function countDBbykw(req, res)
     WHERE k.keyword IN $keywords \
     WITH k \
     MATCH(t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
-    RETURN COUNT(o) \
-      k.keyword AS keyword"
+    RETURN k.keyword AS keyword, COUNT(o) AS count"
 
     const session = driver.session();
 
