@@ -6,6 +6,70 @@ var pwbin = require('./../../pwbin.json')
 // Create Driver
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
+function countDBbykw(req, res)
+{
+
+    passedKeys = Object.keys(req.query);
+
+    if (req.query.keywords === undefined)
+    {
+        req.query.keywords = "";
+    }
+    else
+    {
+        req.query.keywords = req.query.keywords.split(',')
+    }
+
+    query = "MATCH(k: KEYWORD) \
+    WHERE k.keyword IN $keywords \
+    WITH k \
+    MATCH(t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
+    RETURN COUNT(o) \
+      k.keyword AS keyword"
+
+    const session = driver.session();
+
+    /* First, try to find the database itself. */
+
+    const aa = session.readTransaction(tx => tx.run(query,
+        {
+            limit: parseInt(req.query.limit),
+            offset: parseInt(req.query.offset),
+            keywords: req.query.keywords
+        }))
+        .then(result =>
+        {
+            console.log(result.records)
+
+            output = result.records.map(function (x)
+            {
+                var sampler = {}
+
+                for (i = 0; i < x._fields.length; i++)
+                {
+                    sampler[x.keys[i]] = x._fields[i]
+                }
+                return (sampler)
+            })
+
+            res.status(200)
+                .json(
+                {
+                    status: 'success',
+                    data:
+                    {
+                        keywords: output
+                    },
+                    message: 'Returned database counts.'
+                })
+        })
+        .catch(function (err)
+        {
+            console.error(err);
+        })
+}
+
+
 function reposbykw(req, res)
 {
 
@@ -201,3 +265,4 @@ function allkeywords(req, res)
 module.exports.keywords = keywords;
 module.exports.allkeywords = allkeywords;
 module.exports.reposbykw = reposbykw;
+module.exports.countDBbykw = countDBbykw;

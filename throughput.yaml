@@ -36,6 +36,74 @@ paths:
                   $ref: '#/components/schemas/annos'
         '400':
           description: bad input parameter
+  /keyword:
+    get:
+      tags:
+        - keywords
+      summary: searches for keywords related to databases and code repositories
+      operationId: searchRepo
+      description: Looks for a keyword and then finds all related keywords associated with databases and code repositories.
+      parameters:
+        - in: query
+          name: keyword
+          description: Pass a keyword, or partial keyword.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: Maximum number of records to return.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+        - in: query
+          name: offset
+          description: Number of records to skip.
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+      responses:
+        '200':
+          description: keywords matching the search criteria.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/keyword'
+        '400':
+          description: bad input parameter
+  /keyword/dbs/count:
+    get:
+      tags:
+        - databases
+        - summary
+        - count
+        - keywords
+      summary: Returns the count of databases associated with each selected keyword.
+      description: Pass a comma separated list of keywords and return the count of databases associated with each.
+      parameters:
+        - in: query
+          name: keyword
+          description: A comma separated list of keywords in the database.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: search results matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/kwcount'
+        '400':
+          description: bad input parameter
+
   /keyword/resources:
     get:
       tags:
@@ -180,47 +248,6 @@ paths:
                   $ref: '#/components/schemas/repo'
         '400':
           description: bad input parameter
-  /keyword:
-    get:
-      tags:
-        - keywords
-      summary: searches for keywords related to databases and code repositories
-      operationId: searchRepo
-      description: |
-        Looks for a keyword and then finds all related keywords associated with databases and code repositories.
-      parameters:
-        - in: query
-          name: keyword
-          description: Pass a keyword, or partial keyword.
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: limit
-          description: Maximum number of records to return.
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
-        - in: query
-          name: offset
-          description: Number of records to skip.
-          schema:
-            type: integer
-            format: int32
-            minimum: 0
-      responses:
-        '200':
-          description: keywords matching the search criteria.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/keyword'
-        '400':
-          description: bad input parameter
 components:
   schemas:
     keyword:
@@ -295,6 +322,18 @@ components:
         annotations:
           type: integer
           example: 67012
+    kwcount:
+      type: object
+      required:
+        - keyword
+        - count
+      properties:
+        keyword:
+          type: string
+          example: climate
+        count:
+          type: integer
+          example: 23
     kwreturn:
       type: object
       required:
