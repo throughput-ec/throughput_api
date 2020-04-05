@@ -57,7 +57,7 @@ function countDBbykw(req, res)
                     status: 'success',
                     data:
                     {
-                        keywords: output
+                        keywords: result
                     },
                     message: 'Returned database counts.'
                 })
