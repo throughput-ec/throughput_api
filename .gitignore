@@ -2,6 +2,7 @@ awsconfig.txt
 *.pem
 pwbin.json
 pwbin.txt
+package-lock.json
 
 # Logs
 logs
