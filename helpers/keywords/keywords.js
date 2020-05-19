@@ -96,13 +96,14 @@ function reposbykw(req, res)
     query = " MATCH(k: KEYWORD) \
     WHERE k.keyword IN $keywords \
     WITH k \
-    MATCH(t: TYPE)-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
-    WHERE o.id IS NOT NULL \
-    RETURN o.id AS id, \
-         o.name AS name, \
-  o.description AS description, \
-         t.type AS type, \
-      k.keyword AS keyword"
+    MATCH (t: TYPE)-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
+    WHERE o.id IS NOT NULL and \
+          t.type = 'schema:DataCatalog' \
+    RETURN DISTINCT o.id AS id, \
+                  o.name AS name, \
+           o.description AS description, \
+                   o.url AS url, \
+               k.keyword AS keyword"
 
     const session = driver.session();
 
@@ -218,9 +219,6 @@ function keywords(req, res)
 
 function allkeywords(req, res)
 {
-
-
-    console.log(req.query)
 
     cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION) \
                  RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
