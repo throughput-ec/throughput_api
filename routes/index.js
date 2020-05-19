@@ -28,10 +28,29 @@ router.get('/api/linked', function (req, res)
     ccdr.ccdrLinks(req, res);
 })
 
+
+router.get('/api/summary/ccdr', function (req, res)
+{
+    var ccdr = require('./../helpers/summary/summaryCcdr.js');
+    ccdr.summaryCcdr(req, res);
+})
+
+router.get('/api/summary/ccdr/keywords', function (req, res)
+{
+    var ccdr = require('./../helpers/summary/summaryCcdr.js');
+    ccdr.summaryCcdrkw(req, res);
+})
+
 router.get('/api/metrics/type', function (req, res)
 {
     var metrics = require('./../helpers/metrics/metrics.js');
     metrics.nodesByType(req, res);
+})
+
+router.get('/api/metrics/annos', function (req, res)
+{
+  var metrics = require('./../helpers/metrics/metrics.js');
+  metrics.totalAnnot(req, res);
 })
 
 router.get('/api/metrics/annos/users', function (req, res)
@@ -39,13 +58,6 @@ router.get('/api/metrics/annos/users', function (req, res)
     var metrics = require('./../helpers/metrics/metrics.js');
     metrics.topUsers(req, res);
 })
-
-router.get('/api/metrics/annos', function (req, res)
-{
-    var metrics = require('./../helpers/metrics/metrics.js');
-    metrics.totalAnnot(req, res);
-})
-
 
 router.get('/api/repo', function (req, res)
 {
