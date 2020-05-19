@@ -1,81 +1,83 @@
-openapi: 3.0.0
+openapi:                      3.0.0
 # Added by API Auto Mocking Plugin
 servers:
-  - description: Throughput Database API
-    url: http://throughputdb.com/api
+  - description:              Throughput Database API
+    url:                      http://throughputdb.com/api
+  - description:              Local Development API
+    url:                      http://localhost:3000/api
 info:
-  description: API for connecting data resources to research products.
-  version: "1.0.0"
-  title: Throughput API
+  description:                API for connecting data resources to research products.
+  version:                    "1.0.0"
+  title:                      Throughput API
   contact:
-    email: goring@wisc.edu
+    email:                    goring@wisc.edu
   license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name:                     Apache 2.0
+    url:                      'http://www.apache.org/licenses/LICENSE-2.0.html'
 tags:
-  - name: databases
-    description: Calls to return information about databases.
-  - name: repos
-    description: Calls to return information about code repositories.
-  - name: stats
-    description: Database statistics.
+  - name:                     databases
+    description:              Calls to return information about databases.
+  - name:                     repos
+    description:              Calls to return information about code repositories.
+  - name:                     stats
+    description:              Database statistics.
 paths:
   /metrics/annos:
     get:
       tags:
         - stats
-      summary: Return summary information about the number of annotations generated.
+      summary:                Return summary information about the number of annotations generated.
       responses:
         '200':
-          description: Summary of weekly uploads/updates.
+          description:        Summary of weekly uploads/updates.
           content:
             application/json:
               schema:
-                type: array
+                type:         array
                 items:
-                  $ref: '#/components/schemas/annos'
+                  $ref:       '#/components/schemas/annos'
         '400':
-          description: bad input parameter
+          description:        bad input parameter
   /keyword:
     get:
       tags:
         - keywords
-      summary: searches for keywords related to databases and code repositories
-      operationId: searchRepo
-      description: Looks for a keyword and then finds all related keywords associated with databases and code repositories.
+      summary:                searches for keywords related to databases and code repositories
+      operationId:            searchRepo
+      description:            Looks for a keyword and then finds all related keywords associated with databases and code repositories.
       parameters:
-        - in: query
-          name: keyword
-          description: Pass a keyword, or partial keyword.
-          required: false
+        - in:                 query
+          name:               keyword
+          description:        Pass a keyword, or partial keyword.
+          required:           false
           schema:
-            type: string
-        - in: query
-          name: limit
-          description: Maximum number of records to return.
+            type:             string
+        - in:                 query
+          name:               limit
+          description:        Maximum number of records to return.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
-        - in: query
-          name: offset
-          description: Number of records to skip.
+            type:             integer
+            format:           int32
+            minimum:          0
+            maximum:          50
+        - in:                 query
+          name:               offset
+          description:        Number of records to skip.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
+            type:             integer
+            format:           int32
+            minimum:          0
       responses:
         '200':
-          description: keywords matching the search criteria.
+          description:        keywords matching the search criteria.
           content:
             application/json:
               schema:
-                type: array
+                type:         array
                 items:
-                  $ref: '#/components/schemas/keyword'
+                  $ref:       '#/components/schemas/keyword'
         '400':
-          description: bad input parameter
+          description:        bad input parameter
   /keyword/dbs/count:
     get:
       tags:
@@ -83,187 +85,187 @@ paths:
         - summary
         - count
         - keywords
-      summary: Returns the count of databases associated with each selected keyword.
-      description: Pass a comma separated list of keywords and return the count of databases associated with each.
+      summary:                Returns the count of databases associated with each selected keyword.
+      description:            Pass a comma separated list of keywords and return the count of databases associated with each.
       parameters:
-        - in: query
-          name: keyword
-          description: A comma separated list of keywords in the database.
-          required: false
+        - in:                 query
+          name:               keyword
+          description:        A comma separated list of keywords in the database.
+          required:           false
           schema:
-            type: string
+            type:             string
       responses:
         '200':
-          description: search results matching criteria
+          description:        search results matching criteria
           content:
             application/json:
               schema:
-                type: array
+                type:         array
                 items:
-                  $ref: '#/components/schemas/kwcount'
+                  $ref:       '#/components/schemas/kwcount'
         '400':
-          description: bad input parameter
+          description:        bad input parameter
 
   /keyword/resources:
     get:
       tags:
         - databases
-      summary: Pulls data resources by keywords.
-      description: |
+      summary:                Pulls data resources by keywords.
+      description:            |
         Pass a comma separated list of keywords and return the databases that match those keywords.
       parameters:
-        - in: query
-          name: keyword
-          description: A comma separated list of keywords in the database.
-          required: false
+        - in:                 query
+          name:               keyword
+          description:        A comma separated list of keywords in the database.
+          required:           false
           schema:
-            type: string
-        - in: query
-          name: limit
-          description: Maximum number of records to return.
+            type:             string
+        - in:                 query
+          name:               limit
+          description:        Maximum number of records to return.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
-        - in: query
-          name: offset
-          description: Number of records to skip.
+            type:             integer
+            format:           int32
+            minimum:          0
+            maximum:          50
+        - in:                 query
+          name:               offset
+          description:        Number of records to skip.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
+            type:             integer
+            format:           int32
+            minimum:          0
       responses:
         '200':
-          description: search results matching criteria
+          description:        search results matching criteria
           content:
             application/json:
               schema:
-                type: array
+                type:         array
                 items:
-                  $ref: '#/components/schemas/kwreturn'
+                  $ref:       '#/components/schemas/kwreturn'
         '400':
-          description: bad input parameter
+          description:        bad input parameter
   /ccdr:
     get:
       tags:
         - databases
-      summary: searches for a data resource ('schema:DataCatalog')
-      operationId: searchDb
-      description: |
+      summary:                searches for a data resource ('schema:DataCatalog')
+      operationId:            searchDb
+      description:            |
         Passing terms in to search for keywords, subject matter or descriptions associated with data resources on the web.
       parameters:
-        - in: query
-          name: name
-          description: Pass an optional search string for looking up a data resource by name.
-          required: false
+        - in:                 query
+          name:               name
+          description:        Pass an optional search string for looking up a data resource by name.
+          required:           false
           schema:
-            type: string
-        - in: query
-          name: search
-          description: Pass an optional search string for looking up a data resource through context.
-          required: false
+            type:             string
+        - in:                 query
+          name:               search
+          description:        Pass an optional search string for looking up a data resource through context.
+          required:           false
           schema:
-            type: string
-        - in: query
-          name: keyword
-          description: Pass an optional search string for looking up a data resource by registered keyword.
+            type:             string
+        - in:                 query
+          name:               keyword
+          description:        Pass an optional search string for looking up a data resource by registered keyword.
           schema:
-            type: string
-        - in: query
-          name: limit
-          description: Maximum number of records to return.
+            type:             string
+        - in:                 query
+          name:               limit
+          description:        Maximum number of records to return.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
-        - in: query
-          name: offset
-          description: Number of records to skip.
+            type:             integer
+            format:           int32
+            minimum:          0
+            maximum:          50
+        - in:                 query
+          name:               offset
+          description:        Number of records to skip.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
+            type:             integer
+            format:           int32
+            minimum:          0
       responses:
         '200':
-          description: search results matching criteria
+          description:        search results matching criteria
           content:
             application/json:
               schema:
-                type: array
+                type:         array
                 items:
-                  $ref: '#/components/schemas/ccdr'
+                  $ref:       '#/components/schemas/ccdr'
         '400':
-          description: bad input parameter
+          description:        bad input parameter
   /repo:
     get:
       tags:
         - databases
-      summary: searches for a data resource ('schema:CodeRepository')
-      operationId: searchRepo
-      description: |
+      summary:                searches for a data resource ('schema:CodeRepository')
+      operationId:            searchRepo
+      description:            |
         Passing terms in to search for keywords, subject matter or descriptions associated with code resources on the web.
       parameters:
-        - in: query
-          name: name
-          description: Pass an optional search string for looking up a code resource by name.
-          required: false
+        - in:                 query
+          name:               name
+          description:        Pass an optional search string for looking up a code resource by name.
+          required:           false
           schema:
-            type: string
-        - in: query
-          name: search
-          description: Pass an optional search string for looking up a code resource through context.
-          required: false
+            type:             string
+        - in:                 query
+          name:               search
+          description:        Pass an optional search string for looking up a code resource through context.
+          required:           false
           schema:
-            type: string
-        - in: query
-          name: keyword
-          description: Pass an optional search string for looking up a code resource by registered keyword.
+            type:             string
+        - in:                 query
+          name:               keyword
+          description:        Pass an optional search string for looking up a code resource by registered keyword.
           schema:
-            type: string
-        - in: query
-          name: limit
-          description: Maximum number of records to return.
+            type:             string
+        - in:                 query
+          name:               limit
+          description:        Maximum number of records to return.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
-            maximum: 50
-        - in: query
-          name: offset
-          description: Number of records to skip.
+            type:             integer
+            format:           int32
+            minimum:          0
+            maximum:          50
+        - in:                 query
+          name:               offset
+          description:        Number of records to skip.
           schema:
-            type: integer
-            format: int32
-            minimum: 0
+            type:             integer
+            format:           int32
+            minimum:          0
       responses:
         '200':
-          description: search results matching criteria
+          description:        search results matching criteria
           content:
             application/json:
               schema:
-                type: array
+                type:         array
                 items:
-                  $ref: '#/components/schemas/repo'
+                  $ref:       '#/components/schemas/repo'
         '400':
-          description: bad input parameter
+          description:        bad input parameter
 components:
   schemas:
     keyword:
-      type: object
+      type:                   object
       required:
         - keyword
         - resources
       properties:
         keyword:
-          type: string
-          example: 'climate'
+          type:               string
+          example:            'climate'
         resources:
-          type: integer
-          example: 14
+          type:               integer
+          example:            14
     repo:
-      type: object
+      type:                   object
       required:
         - id
         - name
@@ -272,17 +274,17 @@ components:
         - repos
       properties:
         id:
-          type: string
-          example: ''
+          type:               string
+          example:            ''
         name:
-          type: string
-          example: 'jupyter/repo2docker'
+          type:               string
+          example:            'jupyter/repo2docker'
         url:
-          type: string
-          format: url
-          example: 'https://github.com/jupyter/repo2docker'
+          type:               string
+          format:             url
+          example:            'https://github.com/jupyter/repo2docker'
     ccdr:
-      type: object
+      type:                   object
       required:
         - id
         - name
@@ -291,51 +293,51 @@ components:
         - repos
       properties:
         id:
-          type: string
-          example: 'r3d100011761'
+          type:               string
+          example:            'r3d100011761'
         name:
-          type: string
-          example: 'Neotoma Paleoecology Database'
+          type:               string
+          example:            'Neotoma Paleoecology Database'
         description:
-          type: string
-          example: 'Neotoma is a multiproxy paleoecological database that covers the Pliocene-Quaternary, including modern microfossil samples. . .'
+          type:               string
+          example:            'Neotoma is a multiproxy paleoecological database that covers the Pliocene-Quaternary, including modern microfossil samples. . .'
         url:
-          type: string
-          format: url
-          example: 'https://www.neotomadb.org/'
+          type:               string
+          format:             url
+          example:            'https://www.neotomadb.org/'
         repos:
-          type: integer
-          example: 13
+          type:               integer
+          example:            13
     annos:
-      type: object
+      type:                   object
       required:
         - year
         - week
         - annotations
       properties:
         year:
-          type: integer
-          example: 2019
+          type:               integer
+          example:            2019
         week:
-          type: integer
-          example: 3
+          type:               integer
+          example:            3
         annotations:
-          type: integer
-          example: 67012
+          type:               integer
+          example:            67012
     kwcount:
-      type: object
+      type:                   object
       required:
         - keyword
         - count
       properties:
         keyword:
-          type: string
-          example: climate
+          type:               string
+          example:            climate
         count:
-          type: integer
-          example: 23
+          type:               integer
+          example:            23
     kwreturn:
-      type: object
+      type:                   object
       required:
         - id
         - name
@@ -344,20 +346,20 @@ components:
         - keyword
       properties:
         id:
-          type: string
-          example: 'r3d100000002'
+          type:               string
+          example:            'r3d100000002'
         name:
-          type: string
-          example: 'Access to Archival Databases'
+          type:               string
+          example:            'Access to Archival Databases'
         description:
-          type: string
-          example: 'Access to Archival Databases'
+          type:               string
+          example:            'Access to Archival Databases'
         type:
-          type: string
-          example: 'schema:DataCatalog'
+          type:               string
+          example:            'schema:DataCatalog'
         links:
-          type: integer
-          example: 5
+          type:               integer
+          example:            5
         keyword:
-          type: string
-          example: 'us history'
+          type:               string
+          example:            'us history'
