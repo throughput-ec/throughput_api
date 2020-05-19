@@ -3,8 +3,6 @@ const neo4j = require('neo4j-driver');
 
 var pwbin = require('./../../pwbin.json')
 
-console.log(pwbin);
-
 // Create Driver
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
@@ -40,12 +38,9 @@ function searchRepo(req, res)
 
     console.log(req.query)
 
-
-    cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
-                  WHERE  \
-                  (toLower(n.name) CONTAINS toLower($name) OR $name = '') AND \
-                  (toLower(n.description) CONTAINS toLower($search) OR $search = '') \
-                  WITH DISTINCT n \
+    cypher_db = "CALL db.index.fulltext.queryNodes('abstracts', $search) YIELD node, score
+                  WHERE (node)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+                  WITH DISTINCT node, score \
                   OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
                   RETURN DISTINCT ID(n), n.name AS name, n.description AS description, n.url AS url, SIZE(COLLECT(o)) AS dbs \
                   ORDER BY dbs DESC \
