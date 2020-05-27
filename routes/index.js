@@ -18,6 +18,11 @@ router.get('/api/citations', function(req, res) {
   citation.citations(req, res);
 })
 
+router.get('/api/citations/:ids/repos', function(req, res) {
+  var citation = require('./../helpers/citation/citation.js');
+  citation.citationdb(req, res);
+})
+
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCcdrs(req, res);
