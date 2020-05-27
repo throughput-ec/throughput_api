@@ -78,4 +78,66 @@ function citations(req, res) {
     })
 }
 
+
+function citationdb(req, res) {
+
+  if (req.params.ids === undefined) {
+    req.params.ids = "";
+  } else {
+    req.params.ids = req.params.ids.split(',')
+  }
+
+  query = "MATCH (t:TYPE {type:'schema:DataCatalog'})-[: isType]-(o:OBJECT) \
+            WHERE toString(o.id) IN $ids \
+            WITH o \
+            MATCH (o)-[]-(:ANNOTATION)-[]-(oc:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+            OPTIONAL MATCH (oc)-[]-(ag:AGENT)-[]-(at:AGENTTYPE) \
+            WHERE at.type IN ['Person', 'Organization'] \
+           RETURN COLLECT(ag) AS author, oc.name AS title, toString(oc.id) AS id, oc.url AS url"
+
+  const session = driver.session();
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(query, {
+      ids: req.params.ids }))
+    .then(result => {
+      console.log(result.records)
+      output = result.records.map(function(x) {
+        records = parsedata(x)
+        auths = []
+        for (var i = 0; i < records.author.length; i++) {
+          auths.append({name: records.author[i]})
+        }
+        if (records.author.length == 0) {
+          auths = [{name: 'n/a'}]
+        }
+        records['author'] = auths;
+        records['link'] = [{url: records['url']}];
+        records['type'] = 'article';
+        records['year'] = 2020;
+        if (/.*github\.com.*/.test(records.url)) {
+          records['publisher'] = 'GitHub'
+          records['journal'] = {name:'GitHub Repository'}
+        }
+        let output = new Cite(records);
+
+        return (output.format('bibtex'))
+      })
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            citation: output
+          },
+          message: 'Returned citations.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+}
+
+
 module.exports.citations = citations;
+module.exports.citationdb = citationdb;
