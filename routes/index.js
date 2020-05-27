@@ -13,6 +13,11 @@ router.get('/api/annotations', function(req, res) {
   annotation.postannotation(req, res);
 })
 
+router.get('/api/citations', function(req, res) {
+  var citation = require('./../helpers/citation/citation.js');
+  citation.citations(req, res);
+})
+
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCcdrs(req, res);
