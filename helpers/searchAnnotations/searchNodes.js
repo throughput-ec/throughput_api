@@ -20,16 +20,19 @@ function searchNodes(req, res) {
 
   const session = driver.session();
 
-  session.run(cypher, {search: req.query.search, limit: 30})
-  .then(result => {
-    res.status(200)
-      .json({
-        status: 'success',
-        data: result,
-        message: 'Searched for stuff.'
-      });
-    session.close();
-  });
+  session.run(cypher, {
+      search: req.query.search,
+      limit: 30
+    })
+    .then(result => {
+      res.status(200)
+        .json({
+          status: 'success',
+          data: result,
+          message: 'Searched for stuff.'
+        });
+      session.close();
+    });
 
 }
 

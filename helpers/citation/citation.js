@@ -39,25 +39,34 @@ function citations(req, res) {
   /* First, try to find the database itself. */
 
   const aa = session.readTransaction(tx => tx.run(query, {
-      ids: req.query.ids }))
+      ids: req.query.ids
+    }))
     .then(result => {
       console.log(result.records)
       output = result.records.map(function(x) {
         records = parsedata(x)
         auths = []
         for (var i = 0; i < records.author.length; i++) {
-          auths.append({name: records.author[i]})
+          auths.append({
+            name: records.author[i]
+          })
         }
         if (records.author.length == 0) {
-          auths = [{name: 'n/a'}]
+          auths = [{
+            name: 'n/a'
+          }]
         }
         records['author'] = auths;
-        records['link'] = [{url: records['url']}];
+        records['link'] = [{
+          url: records['url']
+        }];
         records['type'] = 'article';
         records['year'] = 2020;
         if (/.*github\.com.*/.test(records.url)) {
           records['publisher'] = 'GitHub'
-          records['journal'] = {name:'GitHub Repository'}
+          records['journal'] = {
+            name: 'GitHub Repository'
+          }
         }
         let output = new Cite(records);
 
@@ -99,25 +108,35 @@ function citationdb(req, res) {
   /* First, try to find the database itself. */
 
   const aa = session.readTransaction(tx => tx.run(query, {
-      ids: req.params.ids }))
+      ids: req.params.ids
+    }))
     .then(result => {
       console.log(result.records)
       output = result.records.map(function(x) {
         records = parsedata(x)
         auths = []
         for (var i = 0; i < records.author.length; i++) {
-          auths.append({name: records.author[i]})
+          auths.append({
+            name: records.author[i]
+          })
         }
         if (records.author.length == 0) {
-          auths = [{name: 'n/a'}]
+          auths = [{
+            name: 'n/a'
+          }]
         }
         records['author'] = auths;
-        records['link'] = [{url: records['url']}];
+        apoc
+        records['link'] = [{
+          url: records['url']
+        }];
         records['type'] = 'article';
         records['year'] = 2020;
         if (/.*github\.com.*/.test(records.url)) {
           records['publisher'] = 'GitHub'
-          records['journal'] = {name:'GitHub Repository'}
+          records['journal'] = {
+            name: 'GitHub Repository'
+          }
         }
         let output = new Cite(records);
 

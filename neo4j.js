@@ -8,7 +8,7 @@ const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.p
 
 // Express middleware
 module.exports = function(req, res, next) {
-    req.driver = driver;
+  req.driver = driver;
 
-    next();
+  next();
 };
