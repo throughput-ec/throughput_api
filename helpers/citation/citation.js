@@ -85,6 +85,7 @@ function citations(req, res) {
     .catch(function(err) {
       console.error(err);
     })
+    .then(() => session.close())
 }
 
 
@@ -155,6 +156,7 @@ function citationdb(req, res) {
     .catch(function(err) {
       console.error(err);
     })
+    .then(() => session.close())
 }
 
 

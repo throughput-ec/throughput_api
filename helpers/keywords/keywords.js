@@ -55,6 +55,7 @@ function countDBbykw(req, res) {
     .catch(function(err) {
       console.error(err);
     })
+    .then(() => session.close())
 }
 
 
@@ -122,6 +123,7 @@ function reposbykw(req, res) {
     .catch(function(err) {
       console.error(err);
     })
+    .then(() => session.close())
 }
 
 function keywords(req, res) {
@@ -181,11 +183,12 @@ function keywords(req, res) {
     .catch(function(err) {
       console.error(err);
     })
+    .then(() => session.close())
 }
 
 function allkeywords(req, res) {
 
-  cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION) \
+  cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION)-[]-(:OBJECT)-[]-(:TYPE {type:'schema:DataCatalog'}) \
                  RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
                  ORDER BY links DESC"
 
@@ -217,6 +220,7 @@ function allkeywords(req, res) {
     .catch(function(err) {
       console.error(err);
     })
+    .then(() => session.close())
 }
 
 module.exports.keywords = keywords;

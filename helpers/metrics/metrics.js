@@ -34,10 +34,10 @@ function nodesByType(req, res) {
         })
 
     })
-    .then(x => driver.close())
     .catch(function(err) {
       console.error(err);
     })
+    .then(x => driver.close())
 
 }
 
@@ -86,10 +86,10 @@ function connectedRepos(req, res) {
         })
 
     })
-    .then(x => driver.close())
     .catch(function(err) {
       console.error(err);
     })
+    .then(x => driver.close())
 
 }
 
@@ -139,10 +139,10 @@ function topUsers(req, res) {
         })
 
     })
-    .then(x => driver.close())
     .catch(function(err) {
       console.error(err);
     })
+    .then(x => driver.close())
 
 }
 
@@ -176,10 +176,10 @@ function totalAnnot(req, res) {
         })
 
     })
-    .then(x => driver.close())
     .catch(function(err) {
       console.error(err);
     })
+    .then(x => driver.close())
 
 }
 

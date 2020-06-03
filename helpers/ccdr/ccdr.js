@@ -115,10 +115,10 @@ function searchCcdrs(req, res) {
           })
       }
     })
-    .then(x => session.close())
     .catch(function(err) {
       console.error(err);
     })
+    .then(x => session.close())
 }
 
 function ccdrLinks(req, res) {
@@ -202,10 +202,10 @@ function ccdrLinks(req, res) {
           })
       }
     })
-    .then(x => session.close())
     .catch(function(err) {
       console.error(err);
     })
+    .then(x => session.close())
 
 
 }

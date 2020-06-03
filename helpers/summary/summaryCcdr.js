@@ -100,10 +100,10 @@ function summaryCcdr(req, res) {
           })
       }
     })
-    .then(x => session.close())
     .catch(function(err) {
       console.error(err);
     })
+    .then(x => session.close())
 
 
 }
