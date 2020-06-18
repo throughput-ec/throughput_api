@@ -126,7 +126,7 @@ function ccdrLinks(req, res) {
   passedKeys = Object.keys(req.query);
 
   if (req.query.limit === undefined) {
-    req.query.limit = 15;
+    req.query.limit = 100;
   }
 
   if (req.query.id === undefined) {

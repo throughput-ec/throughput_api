@@ -56,6 +56,9 @@ function citations(req, res) {
             name: 'n/a'
           }]
         }
+
+        var today = new Date();
+
         records['author'] = auths;
         records['link'] = [{
           url: records['url']
@@ -68,7 +71,16 @@ function citations(req, res) {
             name: 'GitHub Repository'
           }
         }
+        if (/r3d/.test(records.id)) {
+          records['doi'] = 'https://doi.org/10.17616/' + records.id;
+          records['journal'] = {
+            name: 'Re3Data.org'
+          }
+
+        }
         let output = new Cite(records);
+        console.log(output)
+        let date = (new Date()).toLocaleDateString()
 
         return (output.format('bibtex'))
       })
