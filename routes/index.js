@@ -74,6 +74,11 @@ router.get('/api/keyword', function(req, res) {
   query.keywords(req, res);
 })
 
+router.get('/api/keyword/repo/:ccdr', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.keywordbyccdr(req, res);
+})
+
 router.get('/api/keyword/all', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.allkeywords(req, res);
@@ -84,8 +89,12 @@ router.get('/api/keyword/dbs/count', function(req, res) {
   query.countDBbykw(req, res);
 })
 
+router.get('/api/keyword/dbs/linked', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.dbkeywordmix(req, res);
+})
 
-router.get('/api/keyword/repos', function(req, res) {
+router.get('/api/keyword/repos/', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.reposbykw(req, res);
 })
