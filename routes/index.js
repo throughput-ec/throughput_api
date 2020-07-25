@@ -8,21 +8,6 @@ router.get('/api/', function(req, res) {
   });
 });
 
-router.get('/api/annotations', function(req, res) {
-  var annotation = require('./../helpers/postannotation/postannotation.js');
-  annotation.postannotation(req, res);
-})
-
-router.get('/api/citations', function(req, res) {
-  var citation = require('./../helpers/citation/citation.js');
-  citation.citations(req, res);
-})
-
-router.get('/api/citations/:ids/repos', function(req, res) {
-  var citation = require('./../helpers/citation/citation.js');
-  citation.citationdb(req, res);
-})
-
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCcdrs(req, res);
@@ -103,5 +88,11 @@ router.post('/api/datanote', function(req, res) {
   var notes = require('./../helpers/postannotation/datanote.js');
   notes.datanote(req, res);
 })
+
+router.get('/api/db/annotations', function(req, res) {
+  var dbanno = require('./../helpers/searchAnnotations/datasetAnnotation.js');
+  dbanno.databaseAnnotation(req, res);
+})
+
 
 module.exports = router;
