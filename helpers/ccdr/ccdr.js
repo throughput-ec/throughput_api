@@ -67,7 +67,7 @@ function searchCcdrs(req, res) {
   } else {
     queryCall = cypher_db_kw;
   }
-
+  
   /* First, try to find the database itself. */
 
   const aa = session.readTransaction(tx => tx.run(queryCall, {
@@ -141,9 +141,8 @@ function ccdrLinks(req, res) {
 
   console.log(req.query)
 
-
   cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
-                 WHERE  toLower(n.id) IN $id \
+                 WHERE  toLower(toString(n.id)) IN $id \
                   WITH n \
                   MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
                   RETURN toString(o.id), \
@@ -165,8 +164,9 @@ function ccdrLinks(req, res) {
       offset: parseInt(req.query.offset)
     }))
     .then(result => {
+      console.log(result.records)
       const count = result.records.length;
-      console.log(count)
+
       var db = '';
 
       if (count === 0) {

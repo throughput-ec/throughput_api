@@ -89,6 +89,12 @@ router.post('/api/datanote', function(req, res) {
   notes.datanote(req, res);
 })
 
+router.get('/api/citations', function(req, res) {
+  var cite = require('./../helpers/citation/citation.js');
+  cite.citations(req, res);
+})
+
+
 router.get('/api/db/annotations', function(req, res) {
   var dbanno = require('./../helpers/searchAnnotations/datasetAnnotation.js');
   dbanno.databaseAnnotation(req, res);
