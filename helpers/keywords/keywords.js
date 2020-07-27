@@ -24,7 +24,7 @@ function countDBbykw(req, res) {
     req.query.keywords = req.query.keywords.split(',')
   }
 
-  query = "MATCH(k: KEYWORD) \
+  query = "MATCH (k: KEYWORD) \
     WHERE k.keyword IN $keywords \
     WITH k \
     MATCH(t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
@@ -92,7 +92,7 @@ MATCH (t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTAT
     WHERE o.id IS NOT NULL \
 WITH o \
 MATCH (o)-[]-(: ANNOTATION)-[]-(kw:KEYWORD) \
-MATCH (o)-[]-(: ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type: 'schema:CodeRepository'}) \
+OPTIONAL MATCH (o)-[]-(: ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type: 'schema:CodeRepository'}) \
     RETURN DISTINCT o.id AS id,  \
                   o.name AS name,  \
            o.description AS description, \
