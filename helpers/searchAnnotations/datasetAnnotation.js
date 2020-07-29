@@ -42,7 +42,6 @@ function databaseAnnotation(req, res) {
     })
     .then(result => {
       output = parsedata(result);
-      console.log(output)
       res.status(200)
         .json({
           status: 'success',
