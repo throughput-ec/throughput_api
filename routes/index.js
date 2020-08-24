@@ -64,6 +64,11 @@ router.get('/api/keyword/repo/:ccdr', function(req, res) {
   query.keywordbyccdr(req, res);
 })
 
+router.get('/api/keyword/repos/', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.reposbykw(req, res);
+})
+
 router.get('/api/keyword/all', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.allkeywords(req, res);
@@ -79,11 +84,6 @@ router.get('/api/keyword/dbs/linked', function(req, res) {
   query.dbkeywordmix(req, res);
 })
 
-router.get('/api/keyword/repos/', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.reposbykw(req, res);
-})
-
 router.post('/api/datanote', function(req, res) {
   var notes = require('./../helpers/postannotation/datanote.js');
   notes.datanote(req, res);
@@ -93,7 +93,6 @@ router.get('/api/citations', function(req, res) {
   var cite = require('./../helpers/citation/citation.js');
   cite.citations(req, res);
 })
-
 
 router.get('/api/db/annotations', function(req, res) {
   var dbanno = require('./../helpers/searchAnnotations/datasetAnnotation.js');

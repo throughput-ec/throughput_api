@@ -24,9 +24,6 @@ app.use(logger(':date[iso]\t:remote-addr\t:method\t:url\t:status\t:res[content-l
   stream: accessLogStream
 }))
 
-
-const OpenApiValidator = require('express-openapi-validator').OpenApiValidator;
-
 // 3. (optionally) Serve the OpenAPI spec
 const spec = path.join(__dirname, 'throughput.yaml');
 
@@ -36,11 +33,12 @@ var users = require('./routes/users');
 var debug = require('debug')('app4')
 
 var options = {
-  swaggerUrl: 'http://0.0.0.0:3000/api-docs',
+  swaggerUrl: 'http://throughputdb.com/api-docs',
   customCssUrl: '/custom.css'
 }
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
