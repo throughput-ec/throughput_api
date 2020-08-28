@@ -6,7 +6,6 @@ function parsedata(records) {
   result = []
   for (var i = 0; i < Object.keys(records['records']).length; i++) {
     annotation = {}
-    console.log(i)
     loopElem = records['records'][i]
     for (var j = 0; j < loopElem['length']; j++){
       annotation[loopElem['keys'][j]] = loopElem['_fields'][j];
@@ -20,10 +19,16 @@ function parsedata(records) {
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
 function databaseAnnotation(req, res) {
+
+  if (typeof req.query.level === 'undefined')   { req.query.level = '' }
+  if (typeof req.query.link === 'undefined')    { req.query.link = '' }
+
   cypher = "MATCH (n:OBJECT)<-[:Body]-(an:ANNOTATION)-[:Target]->(db:OBJECT) \
             WHERE db.id = $id AND \
             (an)-[:hasMotivation]->(:MOTIVATION {term:'describing'}) AND \
             (n)-[:isType]->(:TYPE {type:'TextualBody'}) \
+            AND ($link = '' OR n.linkid = $link) \
+            AND ($level = '' OR n.level = $level) \
             WITH DISTINCT n, an, db \
               MATCH (an)-[:Created]->(agt:AGENT) \
             RETURN DISTINCT db.id AS database, \
@@ -38,7 +43,9 @@ function databaseAnnotation(req, res) {
   const session = driver.session();
 
   session.run(cypher, {
-      id: req.query.id
+      id: req.query.id,
+      link: req.query.link,
+      level: req.query.level
     })
     .then(result => {
       output = parsedata(result);
