@@ -151,8 +151,8 @@ function ccdrLinks(req, res) {
 
   console.log(req.query)
 
-  cypher_db = "MATCH (o:codeRep) \
-               MATCH (n:dataCat}) \
+  cypher_db = "MATCH (o:codeRepo) \
+               MATCH (n:dataCat) \
                WHERE  toLower(toString(n.id)) IN $id \
                WITH n, o \
                MATCH (n)-[]-(:ANNOTATION)-[]-(o) \

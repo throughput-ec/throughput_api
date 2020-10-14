@@ -7,7 +7,7 @@ var pwbin = require('./../../pwbin.json')
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
 function summaryCcdrkw(req, res) {
-  cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+  cypher_db = "MATCH (n:dataCat) \
                WITH n \
                MATCH (n)-[]-(:ANNOTATION)-[:hasKeyword]-(k:KEYWORD) \
                RETURN DISTINCT n.name AS name, n.description AS desc, COLLECT(DISTINCT k.keyword) AS keywords"
@@ -56,10 +56,10 @@ function summaryCcdr(req, res) {
   console.log(req.query)
 
 
-  cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+  cypher_db = "MATCH (n:dataCat) \
                  WHERE  toLower(n.id) IN $id \
                   WITH n \
-                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:codeRepo) \
                   RETURN DISTINCT n.id AS id, COUNT(o) AS repos"
 
   const session = driver.session();

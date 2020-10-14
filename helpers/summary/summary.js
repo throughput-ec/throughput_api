@@ -7,11 +7,11 @@ var pwbin = require('./../../pwbin.json')
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
 function summaryType(req, res) {
-  cypher_db = "MATCH (oa:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+  cypher_db = "MATCH (oa:dataCat'}) \
                WITH COUNT(DISTINCT oa) AS dbs \
-               MATCH (ob:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+               MATCH (ob:codeRepo) \
                WITH dbs, COUNT(DISTINCT ob) AS repos \
-               MATCH (:TYPE {type:'schema:DataCatalog'})-[:isType]-(:OBJECT)-[]-(a:ANNOTATION)-[]-(:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+               MATCH (:dataCat)-[]-(a:ANNOTATION)-[]-(:codeRepo) \
                RETURN dbs, repos, COUNT(DISTINCT(a)) AS links"
 
   const session = driver.session();
