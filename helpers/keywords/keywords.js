@@ -27,7 +27,7 @@ function countDBbykw(req, res) {
   query = "MATCH (k: KEYWORD) \
     WHERE k.keyword IN $keywords \
     WITH k \
-    MATCH(t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
+    MATCH (o:dataCat)-[]-(: ANNOTATION)-[]-(k) \
     RETURN k.keyword AS keyword, COUNT(o) AS count"
 
   const session = driver.session();
@@ -88,11 +88,11 @@ function reposbykw(req, res) {
   query = "MATCH (k:KEYWORD) \
 WHERE ANY(x in k.keyword WHERE ANY(y IN $keywords WHERE x = y)) \
 WITH k \
-MATCH (t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
+MATCH (o:dataCat)-[]-(: ANNOTATION)-[]-(k) \
     WHERE o.id IS NOT NULL \
 WITH o \
 MATCH (o)-[]-(: ANNOTATION)-[]-(kw:KEYWORD) \
-OPTIONAL MATCH (o)-[]-(: ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type: 'schema:CodeRepository'}) \
+OPTIONAL MATCH (o)-[]-(: ANNOTATION)-[]-(n:codeRepo) \
     RETURN DISTINCT o.id AS id,  \
                   o.name AS name,  \
            o.description AS description, \
@@ -157,9 +157,8 @@ function keywords(req, res) {
     req.query.offset = 0;
   }
 
-  cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(t:TYPE) \
-                 WHERE t.type IN ['schema:CodeRepository', 'schema:DataCatalog'] AND \
-                 toLower(k.keyword) CONTAINS toLower($keyword) \
+  cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:dataCat|codeRepo) \
+                 WHERE toLower(k.keyword) CONTAINS toLower($keyword) \
                  WITH o \
                  MATCH (o)-[]-(:ANNOTATION)-[]-(a:KEYWORD) \
                  RETURN DISTINCT toLower(a.keyword) AS keyword, COUNT(toLower(a.keyword)) AS resources \
@@ -205,18 +204,17 @@ function dbkeywordmix(req, res) {
 
   /* Query to return linked keywords and associated counts. */
 
-  cypher_any = "MATCH (:TYPE {type:'schema:DataCatalog'})<-[:isType]-(n:OBJECT)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
+  cypher_any = "MATCH (n:dataCat)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
   WITH n, COLLECT(DISTINCT k.keyword) AS kws \
   WHERE ANY(x IN $keywords WHERE ANY(y IN kws WHERE x = y)) \
-  MATCH (n)-[]-(:ANNOTATION)-[]-(a:OBJECT)-[]-(:ANNOTATION)-[]-(b:OBJECT)-[]-(:ANNOTATION)-[:hasKeyword]-(kw:KEYWORD) \
-  WHERE (a)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) AND \
-        (b)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) AND n < b \
+  MATCH (n)-[]-(:ANNOTATION)-[]-(a:codeRepo)-[]-(:ANNOTATION)-[]-(b:dataCat)-[]-(:ANNOTATION)-[:hasKeyword]-(kw:KEYWORD) \
+  WHERE n < b \
   WITH DISTINCT b, COLLECT(DISTINCT kw.keyword) AS kws \
   UNWIND kws AS keywords \
   RETURN DISTINCT keywords, COUNT(keywords) AS count \
   ORDER BY count DESC"
 
-  cypher_all = "MATCH (:TYPE {type:'schema:DataCatalog'})<-[:isType]-(n:OBJECT)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
+  cypher_all = "MATCH (n:dataCat)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
   WITH n, COLLECT(DISTINCT k.keyword) AS kws \
   WHERE ALL(x IN $keywords WHERE ANY(y IN kws WHERE x = y)) \
   WITH kws \
@@ -256,7 +254,7 @@ function dbkeywordmix(req, res) {
 
 function allkeywords(req, res) {
 
-  cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION)-[]-(:OBJECT)-[]-(:TYPE {type:'schema:DataCatalog'}) \
+  cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION)-[]-(:dataCat) \
                  RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
                  ORDER BY links DESC"
 
