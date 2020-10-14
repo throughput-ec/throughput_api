@@ -33,24 +33,33 @@ function searchCcdrs(req, res) {
   console.log(req.query)
 
 
-  cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+  cypher_db = "MATCH (n:dataCat) \
                   WHERE  \
                   (toLower(n.name) CONTAINS toLower($name) OR $name = '') AND \
                   (toLower(n.description) CONTAINS toLower($search) OR $search = '') \
                   WITH DISTINCT n \
-                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
-                  RETURN DISTINCT n.id AS id, n.name AS name, n.description AS description, n.url AS url, SIZE(COLLECT(o)) AS code \
+                  MATCH (n)-[]-(:ANNOTATION)-[]-(o:codeRepo) \
+                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o) \
+                  RETURN DISTINCT n.id AS id, \
+                                  n.name AS name, \
+                                  n.description AS description, \
+                                  n.url AS url, \
+                                  SIZE(COLLECT(o)) AS code \
                   ORDER BY code DESC \
                   SKIP toInteger($offset) \
                   LIMIT toInteger($limit)"
 
-  cypher_db_kw = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
+  cypher_db_kw = "MATCH (n:dataCat) \
                   WHERE  \
                   (toLower(n.name) CONTAINS toLower($name) OR $name = '') AND \
-                  (toLower(n.description) CONTAINS toLower($search) OR $search = '') AND \
-                  (toLower(k.keyword)) CONTAINS toLower($keyword) \
+                  (toLower(n.description) CONTAINS toLower($search) OR $search = '') \
+                  WITH n \
+                  MATCH (k:KEYWORD) \
+                  WHERE \
+                    ((toLower(k.keyword) CONTAINS toLower($keyword) OR $keyword = '')) \
+                  MATCH (k)-[]-(:ANNOTATION)-[]-(n) \
                   WITH DISTINCT n \
-                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:codeRepo) \
                   RETURN DISTINCT n.id as id, \
                                   n.name AS name, \
                                   n.description AS description, \
@@ -66,8 +75,9 @@ function searchCcdrs(req, res) {
     queryCall = cypher_db;
   } else {
     queryCall = cypher_db_kw;
+    console.log('hey')
   }
-  
+
   /* First, try to find the database itself. */
 
   const aa = session.readTransaction(tx => tx.run(queryCall, {
@@ -141,15 +151,16 @@ function ccdrLinks(req, res) {
 
   console.log(req.query)
 
-  cypher_db = "MATCH (n:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
-                 WHERE  toLower(toString(n.id)) IN $id \
-                  WITH n \
-                  MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
-                  RETURN toString(o.id), \
+  cypher_db = "MATCH (o:codeRep) \
+               MATCH (n:dataCat}) \
+               WHERE  toLower(toString(n.id)) IN $id \
+               WITH n, o \
+               MATCH (n)-[]-(:ANNOTATION)-[]-(o) \
+               RETURN toString(o.id), \
                          o.name, \
                          o.description, \
                          o.url, \
-                         COLLECT(DISTINCT n.name) AS dbs\
+                         COLLECT(DISTINCT n.name) AS dbs \
                   ORDER BY size(dbs) DESC \
                   SKIP toInteger($offset) \
                   LIMIT toInteger($limit)"
