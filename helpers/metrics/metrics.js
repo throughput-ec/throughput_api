@@ -8,7 +8,40 @@ console.log(pwbin);
 // Create Driver
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
-function nodesByType(req, res) {
+function nodesByTypeAgent(req, res) {
+
+  types = "MATCH (n)-[:isType]-(t:TYPE) \
+             RETURN DISTINCT(t.type) AS type, COUNT(n) AS nodes"
+
+  const session = driver.session();
+
+  const aa = session.readTransaction(tx => tx.run(types))
+    .then(result => {
+      console.log(result.records)
+      var output = result.records.map(x => {
+        return ({
+          type: x._fields[0],
+          count: Math.max(x._fields[1])
+        })
+      })
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            counts: output
+          },
+          message: 'Results.'
+        })
+
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(x => driver.close())
+
+}
+
+function nodesByTypeUser(req, res) {
 
   types = "MATCH (n)-[:isType]-(t:TYPE) \
              RETURN DISTINCT(t.type) AS type, COUNT(n) AS nodes"

@@ -18,7 +18,6 @@ router.get('/api/linked', function(req, res) {
   ccdr.ccdrLinks(req, res);
 })
 
-
 router.get('/api/summary/types', function(req, res) {
   var ccdr = require('./../helpers/summary/summary.js');
   ccdr.summaryType(req, res);
