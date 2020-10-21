@@ -8,8 +8,6 @@ const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.p
 
 function searchCcdrs(req, res) {
 
-  console.log('searching')
-
   if (req.query.search === undefined) {
     req.query.search = "";
   }
@@ -76,7 +74,10 @@ function searchCcdrs(req, res) {
 
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
     .then(result => {
-      //const count = result.records.length;
+      console.log(result)
+    })
+      /*
+      const count = result.records.length;
       console.log(result)
       var db = '';
 
@@ -117,6 +118,7 @@ function searchCcdrs(req, res) {
       console.error(err);
     })
     .then(() => session.close())
+    */
 }
 
 function ccdrLinks(req, res) {
