@@ -13,7 +13,7 @@ router.get('/api/ccdr', function(req, res) {
   ccdr.searchCcdrs(req, res);
 })
 
-router.get('/api/linked', function(req, res) {
+router.get('/api/ccdr/linked', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.ccdrLinks(req, res);
 })
