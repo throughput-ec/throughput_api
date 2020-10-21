@@ -21,8 +21,6 @@ function searchCcdrs(req, res) {
     req.query.offset = 0;
   }
 
-  console.log(req.query)
-
   // Query for searching for a database by name:
   const cypher_db = "CALL db.index.fulltext.queryNodes('namesAndDescriptions', $search) \
                YIELD node, score \
@@ -70,13 +68,15 @@ function searchCcdrs(req, res) {
         offset: parseInt(req.query.offset),
       }
   }
+
   /* First, try to find the database itself. */
+  console.log(queryParam)
 
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
     .then(result => {
       console.log(result)
     }).catch(err => {
-    console.log(err);
+      console.log(err.message);
     })
       /*
       const count = result.records.length;
