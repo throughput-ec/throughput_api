@@ -47,15 +47,11 @@ function searchCcdrs(req, res) {
                SKIP toInteger($offset) \
                LIMIT toInteger($limit)"
 
-  cypher_db_kw = "MATCH (n:dataCat) \
-                  WHERE  \
-                  (toLower(n.name) CONTAINS toLower($name) OR $name = '') AND \
-                  (toLower(n.description) CONTAINS toLower($search) OR $search = '') \
-                  WITH n \
-                  MATCH (k:KEYWORD) \
+  cypher_db_kw = "MATCH (k:KEYWORD) \
                   WHERE \
                     ((toLower(k.keyword) CONTAINS toLower($keyword) OR $keyword = '')) \
-                  MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[:Target]->(n) \
+                  WITH k \
+                  MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(n:dataCat) \
                   WITH DISTINCT n \
                   OPTIONAL MATCH (n)<-[:Target]-(:ANNOTATION)-[:Target]->(o:codeRepo) \
                   RETURN DISTINCT n.id as id, \
@@ -73,7 +69,6 @@ function searchCcdrs(req, res) {
     queryCall = cypher_db;
   } else {
     queryCall = cypher_db_kw;
-    console.log('hey')
   }
 
   /* First, try to find the database itself. */
