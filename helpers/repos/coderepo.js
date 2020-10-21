@@ -32,28 +32,29 @@ function searchRepo(req, res) {
 
   console.log(req.query)
 
-  cypher_db = "CALL db.index.fulltext.queryNodes('abstracts', $search) YIELD node, score
-  WHERE(node) - [: isType] - (: TYPE {
-    type: 'schema:CodeRepository'
-  })\
-  WITH DISTINCT node, score\
-  OPTIONAL MATCH(n) - [] - (: ANNOTATION) - [] - (o: OBJECT) - [: isType] - (: TYPE {
-    type: 'schema:DataCatalog'
-  })\
-  RETURN DISTINCT ID(n), n.name AS name, n.description AS description, n.url AS url, SIZE(COLLECT(o)) AS dbs\
-  ORDER BY dbs DESC\
-  SKIP toInteger(offset)\
-  LIMIT toInteger(limit)
-  "
+  cypher_db = "CALL db.index.fulltext.queryNodes('namesAndDescriptions', $search) \
+               YIELD node, score \
+               WHERE 'codeRepo' IN labels(node) \
+               WITH node \
+               OPTIONAL MATCH (node)<-[:Target]-(:ANNOTATION)-[:Target]->(o:dataCat) \
+               RETURN DISTINCT node.id as id, \
+                               node.name AS name, \
+                               node.description AS description, \
+                               node.url AS url, \
+                               toInteger(SIZE(COLLECT(o))) AS dbs \
+               SKIP toInteger($offset) \
+               LIMIT toInteger($limit)"
 
-  cypher_db_kw = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) \
+  cypher_db_kw = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:codeRepo) \
                   WHERE  \
-                  (toLower(n.name) CONTAINS toLower($name) OR $name = '') AND \
-                  (toLower(n.description) CONTAINS toLower($search) OR $search = '') AND \
                   (toLower(k.keyword)) CONTAINS toLower($keyword) \
                   WITH DISTINCT n \
-                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) \
-                  RETURN DISTINCT ID(n), n.name AS name, n.description AS description, n.url AS url, toInteger(SIZE(COLLECT(o))) AS dbs \
+                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:dataCat) \
+                  RETURN DISTINCT n.id, \
+                         n.name AS name, \
+                         n.description AS description, \
+                         n.url AS url, \
+                         toInteger(SIZE(COLLECT(o))) AS dbs \
                   ORDER BY dbs DESC \
                   SKIP toInteger(offset) \
                   LIMIT toInteger(limit)"
@@ -95,11 +96,11 @@ function searchRepo(req, res) {
         output = result.records.map(function(x) {
 
           return {
-            id: x['_fields'][0],
+            id: Math.max(x['_fields'][0]),
             name: x['_fields'][1],
             description: x['_fields'][2],
             url: x['_fields'][3],
-            repos: Math.max(x['_fields'][4])
+            dbs: Math.max(x['_fields'][4])
           }
         })
         res.status(200)

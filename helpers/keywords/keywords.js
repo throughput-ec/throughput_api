@@ -14,12 +14,134 @@ function parsedata(records) {
 // Create Driver
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
+/* Functions give:
+    - all keywords with the count of all annotations (allkeywords)
+    - all keywords with the count of all databases (dbkeywords)
+    - all keywords with the count of all repositories (repokeywords)
+*/
+
+function allkeywords(req, res) {
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
+
+  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION) \
+                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
+                 ORDER BY links DESC"
+
+  const session = driver.session();
+
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(cypher_st, {
+      limit: parseInt(req.query.limit),
+      offset: parseInt(req.query.offset),
+      keyword: req.query.keyword
+    }))
+    .then(result => {
+      output = result.records.map(function(x) {
+        sampler = {
+          [x.keys[0]]: x._fields[0],
+          [x.keys[1]]: Math.max(x._fields[1])
+        }
+        return (sampler)
+      })
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: output,
+          message: 'Returned linked repositories.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(() => session.close())
+}
+
+function dbkeywords(req, res) {
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
+
+  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION)-[:Body]->(:dataCat) \
+                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
+                 ORDER BY links DESC"
+
+  const session = driver.session();
+
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(cypher_st, {
+      limit: parseInt(req.query.limit),
+      offset: parseInt(req.query.offset),
+      keyword: req.query.keyword
+    }))
+    .then(result => {
+      output = result.records.map(function(x) {
+        sampler = {
+          [x.keys[0]]: x._fields[0],
+          [x.keys[1]]: Math.max(x._fields[1])
+        }
+        return (sampler)
+      })
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: output,
+          message: 'Returned linked repositories.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(() => session.close())
+}
+
+
+function repokeywords(req, res) {
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
+
+  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION)-[:Body]->(:codeRepo) \
+                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
+                 ORDER BY links DESC"
+
+  const session = driver.session();
+
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(cypher_st, {
+      limit: parseInt(req.query.limit),
+      offset: parseInt(req.query.offset),
+      keyword: req.query.keyword
+    }))
+    .then(result => {
+      output = result.records.map(function(x) {
+        sampler = {
+          [x.keys[0]]: x._fields[0],
+          [x.keys[1]]: Math.max(x._fields[1])
+        }
+        return (sampler)
+      })
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: output,
+          message: 'Returned linked repositories.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(() => session.close())
+}
+
+
 function countDBbykw(req, res) {
 
   passedKeys = Object.keys(req.query);
 
   if (req.query.keywords === undefined) {
-    req.query.keywords = "";
+    req.query.keywords = [""];
   } else {
     req.query.keywords = req.query.keywords.split(',')
   }
@@ -27,7 +149,7 @@ function countDBbykw(req, res) {
   query = "MATCH (k: KEYWORD) \
     WHERE k.keyword IN $keywords \
     WITH k \
-    MATCH(t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
+    MATCH (o:dataCat)-[]-(: ANNOTATION)-[]-(k) \
     RETURN k.keyword AS keyword, COUNT(o) AS count"
 
   const session = driver.session();
@@ -66,9 +188,8 @@ function countDBbykw(req, res) {
     .then(() => session.close())
 }
 
-
 function reposbykw(req, res) {
-
+  // Code repositories associated with
   passedKeys = Object.keys(req.query);
 
   if (req.query.keywords === undefined) {
@@ -88,11 +209,11 @@ function reposbykw(req, res) {
   query = "MATCH (k:KEYWORD) \
 WHERE ANY(x in k.keyword WHERE ANY(y IN $keywords WHERE x = y)) \
 WITH k \
-MATCH (t: TYPE {type:'schema:DataCatalog'})-[: isType]-(o: OBJECT)-[]-(: ANNOTATION)-[]-(k) \
+MATCH (o:dataCat)-[]-(: ANNOTATION)-[]-(k) \
     WHERE o.id IS NOT NULL \
 WITH o \
 MATCH (o)-[]-(: ANNOTATION)-[]-(kw:KEYWORD) \
-OPTIONAL MATCH (o)-[]-(: ANNOTATION)-[]-(n:OBJECT)-[:isType]-(:TYPE {type: 'schema:CodeRepository'}) \
+OPTIONAL MATCH (o)-[]-(: ANNOTATION)-[]-(n:codeRepo) \
     RETURN DISTINCT o.id AS id,  \
                   o.name AS name,  \
            o.description AS description, \
@@ -157,9 +278,8 @@ function keywords(req, res) {
     req.query.offset = 0;
   }
 
-  cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT)-[:isType]-(t:TYPE) \
-                 WHERE t.type IN ['schema:CodeRepository', 'schema:DataCatalog'] AND \
-                 toLower(k.keyword) CONTAINS toLower($keyword) \
+  cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:dataCat|codeRepo) \
+                 WHERE toLower(k.keyword) CONTAINS toLower($keyword) \
                  WITH o \
                  MATCH (o)-[]-(:ANNOTATION)-[]-(a:KEYWORD) \
                  RETURN DISTINCT toLower(a.keyword) AS keyword, COUNT(toLower(a.keyword)) AS resources \
@@ -205,18 +325,17 @@ function dbkeywordmix(req, res) {
 
   /* Query to return linked keywords and associated counts. */
 
-  cypher_any = "MATCH (:TYPE {type:'schema:DataCatalog'})<-[:isType]-(n:OBJECT)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
+  cypher_any = "MATCH (n:dataCat)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
   WITH n, COLLECT(DISTINCT k.keyword) AS kws \
   WHERE ANY(x IN $keywords WHERE ANY(y IN kws WHERE x = y)) \
-  MATCH (n)-[]-(:ANNOTATION)-[]-(a:OBJECT)-[]-(:ANNOTATION)-[]-(b:OBJECT)-[]-(:ANNOTATION)-[:hasKeyword]-(kw:KEYWORD) \
-  WHERE (a)-[:isType]-(:TYPE {type:'schema:CodeRepository'}) AND \
-        (b)-[:isType]-(:TYPE {type:'schema:DataCatalog'}) AND n < b \
+  MATCH (n)-[]-(:ANNOTATION)-[]-(a:codeRepo)-[]-(:ANNOTATION)-[]-(b:dataCat)-[]-(:ANNOTATION)-[:hasKeyword]-(kw:KEYWORD) \
+  WHERE n < b \
   WITH DISTINCT b, COLLECT(DISTINCT kw.keyword) AS kws \
   UNWIND kws AS keywords \
   RETURN DISTINCT keywords, COUNT(keywords) AS count \
   ORDER BY count DESC"
 
-  cypher_all = "MATCH (:TYPE {type:'schema:DataCatalog'})<-[:isType]-(n:OBJECT)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
+  cypher_all = "MATCH (n:dataCat)-[]-(:ANNOTATION)-[]-(k:KEYWORD) \
   WITH n, COLLECT(DISTINCT k.keyword) AS kws \
   WHERE ALL(x IN $keywords WHERE ANY(y IN kws WHERE x = y)) \
   WITH kws \
@@ -231,43 +350,6 @@ function dbkeywordmix(req, res) {
 
   const aa = session.readTransaction(tx => tx.run(cypher_all, {
       keywords: req.query.keywords.split(',')
-    }))
-    .then(result => {
-      output = result.records.map(function(x) {
-        sampler = {
-          [x.keys[0]]: x._fields[0],
-          [x.keys[1]]: Math.max(x._fields[1])
-        }
-        return (sampler)
-      })
-
-      res.status(200)
-        .json({
-          status: 'success',
-          data: output,
-          message: 'Returned linked repositories.'
-        })
-    })
-    .catch(function(err) {
-      console.error(err);
-    })
-    .then(() => session.close())
-}
-
-function allkeywords(req, res) {
-
-  cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION)-[]-(:OBJECT)-[]-(:TYPE {type:'schema:DataCatalog'}) \
-                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
-                 ORDER BY links DESC"
-
-  const session = driver.session();
-
-  /* First, try to find the database itself. */
-
-  const aa = session.readTransaction(tx => tx.run(cypher_st, {
-      limit: parseInt(req.query.limit),
-      offset: parseInt(req.query.offset),
-      keyword: req.query.keyword
     }))
     .then(result => {
       output = result.records.map(function(x) {
@@ -328,9 +410,11 @@ function keywordbyccdr(req, res) {
     .then(() => session.close())
 }
 
-module.exports.keywordbyccdr = keywordbyccdr;
-module.exports.keywords = keywords;
 module.exports.allkeywords = allkeywords;
+module.exports.dbkeywords = dbkeywords;
+module.exports.repokeywords = repokeywords;
 module.exports.reposbykw = reposbykw;
 module.exports.countDBbykw = countDBbykw;
 module.exports.dbkeywordmix = dbkeywordmix;
+module.exports.keywords = keywords;
+module.exports.keywordbyccdr = keywordbyccdr;

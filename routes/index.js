@@ -8,36 +8,80 @@ router.get('/api/', function(req, res) {
   });
 });
 
+// Search endpoints associated with CCDRs:
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCcdrs(req, res);
 })
 
-router.get('/api/linked', function(req, res) {
+router.get('/api/ccdr/linked', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.ccdrLinks(req, res);
 })
 
+// Search endpoints associated with CCDRs:
+router.get('/api/repo', function(req, res) {
+  var ccdr = require('./../helpers/repos/coderepo.js');
+  ccdr.searchRepo(req, res);
+})
 
+/*
+ Summary endpoints:
+ Summarizing:
+   - node type counts: '/api/summary/types'
+   - agent type counts: '/api/summary/agenttypes'
+*/
 router.get('/api/summary/types', function(req, res) {
+  // Number of annotations by OBJECT type.
   var ccdr = require('./../helpers/summary/summary.js');
   ccdr.summaryType(req, res);
 })
 
-router.get('/api/summary/ccdr', function(req, res) {
-  var ccdr = require('./../helpers/summary/summaryCcdr.js');
-  ccdr.summaryCcdr(req, res);
+router.get('/api/summary/typeagent', function(req, res) {
+  // Number of annotations by agent type.
+  var metrics = require('./../helpers/summary/summary.js');
+  metrics.summaryTypeAgent(req, res);
 })
 
-router.get('/api/summary/ccdr/keywords', function(req, res) {
-  var ccdr = require('./../helpers/summary/summaryCcdr.js');
-  ccdr.summaryCcdrkw(req, res);
+// Keywords
+router.get('/api/keyword/all', function(req, res) {
+  // Returns all keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.allkeywords(req, res);
 })
 
-router.get('/api/metrics/type', function(req, res) {
-  var metrics = require('./../helpers/metrics/metrics.js');
-  metrics.nodesByType(req, res);
+router.get('/api/keyword/all/ccdr', function(req, res) {
+  // Returns all database keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.dbkeywords(req, res);
 })
+
+router.get('/api/keyword/all/repo', function(req, res) {
+  // Returns all database keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.repokeywords(req, res);
+})
+
+
+router.get('/api/keyword/dbs/count', function(req, res) {
+  // Returns all keywords associated with data catalogs.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.countDBbykw(req, res);
+})
+
+
+
+// Currently removing implementation.  Why did I need this?
+//router.get('/api/summary/ccdr', function(req, res) {
+//  var ccdr = require('./../helpers/summary/summaryCcdr.js');
+//  ccdr.summaryCcdr(req, res);
+//})
+
+// Currently removing implementation.  Why did I need this?
+//router.get('/api/summary/ccdr/keywords', function(req, res) {
+//  var ccdr = require('./../helpers/summary/summaryCcdr.js');
+//  ccdr.summaryCcdrkw(req, res);
+//})
 
 router.get('/api/metrics/annos', function(req, res) {
   var metrics = require('./../helpers/metrics/metrics.js');
@@ -67,11 +111,6 @@ router.get('/api/keyword/repo/:ccdr', function(req, res) {
 router.get('/api/keyword/repos/', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.reposbykw(req, res);
-})
-
-router.get('/api/keyword/all', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.allkeywords(req, res);
 })
 
 router.get('/api/keyword/dbs/count', function(req, res) {

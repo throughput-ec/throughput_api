@@ -57,8 +57,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 
 
-/// error handlers
-
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
