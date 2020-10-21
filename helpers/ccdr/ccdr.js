@@ -77,12 +77,6 @@ function searchCcdrs(req, res) {
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
 
   aa.then(result => {
-      console.log(result)
-    }).catch(() => {
-      console.log('crapo');
-    })
-    .finally(() => session.close())
-      /*
       const count = result.records.length;
       console.log(result)
       var db = '';
@@ -123,8 +117,8 @@ function searchCcdrs(req, res) {
     .catch(function(err) {
       console.error(err);
     })
+    .finally(() => session.close())
 
-    */
 }
 
 function ccdrLinks(req, res) {
