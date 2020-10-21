@@ -87,3 +87,7 @@ Code repositories linked to research databases:
   - `limit`: [30] Maximum number of records to return.
 
   - `offset`: [30] Maximum number of records to return.
+
+### Summary Endpoints
+
+- `http://throughputdb.com/api/summary/types` Returns the count of each object type in the database.

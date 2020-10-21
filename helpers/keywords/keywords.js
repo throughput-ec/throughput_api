@@ -19,7 +19,7 @@ function countDBbykw(req, res) {
   passedKeys = Object.keys(req.query);
 
   if (req.query.keywords === undefined) {
-    req.query.keywords = "";
+    req.query.keywords = [""];
   } else {
     req.query.keywords = req.query.keywords.split(',')
   }
@@ -66,9 +66,8 @@ function countDBbykw(req, res) {
     .then(() => session.close())
 }
 
-
 function reposbykw(req, res) {
-
+  // Code repositories associated with
   passedKeys = Object.keys(req.query);
 
   if (req.query.keywords === undefined) {
@@ -254,7 +253,7 @@ function dbkeywordmix(req, res) {
 
 function allkeywords(req, res) {
 
-  cypher_st = "MATCH (k:KEYWORD)-[]-(n:ANNOTATION)-[]-(:dataCat) \
+  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION) \
                  RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
                  ORDER BY links DESC"
 

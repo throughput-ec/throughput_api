@@ -217,6 +217,7 @@ function totalAnnot(req, res) {
 }
 
 
-module.exports.nodesByType = nodesByType;
+module.exports.nodesByTypeAgent = nodesByTypeAgent;
 module.exports.totalAnnot = totalAnnot;
 module.exports.topUsers = topUsers;
+module.exports.connectedRepos = connectedRepos;

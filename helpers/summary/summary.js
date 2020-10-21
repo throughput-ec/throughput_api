@@ -7,12 +7,9 @@ var pwbin = require('./../../pwbin.json')
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
 function summaryType(req, res) {
-  cypher_db = "MATCH (oa:dataCat'}) \
-               WITH COUNT(DISTINCT oa) AS dbs \
-               MATCH (ob:codeRepo) \
-               WITH dbs, COUNT(DISTINCT ob) AS repos \
-               MATCH (:dataCat)-[]-(a:ANNOTATION)-[]-(:codeRepo) \
-               RETURN dbs, repos, COUNT(DISTINCT(a)) AS links"
+  cypher_db = "MATCH (o) \
+               WITH LABELS(o)[0] AS types \
+               RETURN DISTINCT types, COUNT(types) AS count"
 
   const session = driver.session();
 
@@ -24,9 +21,8 @@ function summaryType(req, res) {
 
       output = result.records.map(function(x) {
         return {
-          database: Math.max(x['_fields'][0]),
-          code: Math.max(x['_fields'][1]),
-          links: Math.max(x['_fields'][2]),
+          types: x['_fields'][0],
+          count: Math.max(x['_fields'][1])
         }
       })
       res.status(200)
@@ -43,4 +39,40 @@ function summaryType(req, res) {
 
 }
 
+
+function summaryTypeAgent(req, res) {
+
+  types = "MATCH (o:OBJECT)-[:Created|Generated]->(n:AGENT)-[:isAgentType]->(t:AGENTTYPE) \
+             RETURN DISTINCT(t.type) AS type, COUNT(o) AS nodes"
+
+  const session = driver.session();
+
+  const aa = session.readTransaction(tx => tx.run(types))
+    .then(result => {
+      console.log(result.records)
+      var output = result.records.map(x => {
+        return ({
+          type: x._fields[0],
+          count: Math.max(x._fields[1])
+        })
+      })
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            counts: output
+          },
+          message: 'Results.'
+        })
+
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(x => driver.close())
+
+}
+
+
 module.exports.summaryType = summaryType;
+module.exports.summaryTypeAgent = summaryTypeAgent;

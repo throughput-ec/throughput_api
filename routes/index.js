@@ -43,6 +43,21 @@ router.get('/api/summary/typeagent', function(req, res) {
   metrics.summaryTypeAgent(req, res);
 })
 
+// Keywords
+router.get('/api/keyword/all', function(req, res) {
+  // Returns all keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.allkeywords(req, res);
+})
+
+
+router.get('/api/keyword/dbs/count', function(req, res) {
+  // Returns all keywords associated with data catalogs.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.countDBbykw(req, res);
+})
+
+
 
 // Currently removing implementation.  Why did I need this?
 //router.get('/api/summary/ccdr', function(req, res) {
@@ -84,11 +99,6 @@ router.get('/api/keyword/repo/:ccdr', function(req, res) {
 router.get('/api/keyword/repos/', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.reposbykw(req, res);
-})
-
-router.get('/api/keyword/all', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.allkeywords(req, res);
 })
 
 router.get('/api/keyword/dbs/count', function(req, res) {
