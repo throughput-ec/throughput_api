@@ -50,6 +50,18 @@ router.get('/api/keyword/all', function(req, res) {
   query.allkeywords(req, res);
 })
 
+router.get('/api/keyword/all/ccdr', function(req, res) {
+  // Returns all database keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.dbkeywords(req, res);
+})
+
+router.get('/api/keyword/all/repo', function(req, res) {
+  // Returns all database keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.repokeywords(req, res);
+})
+
 
 router.get('/api/keyword/dbs/count', function(req, res) {
   // Returns all keywords associated with data catalogs.

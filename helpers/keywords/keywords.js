@@ -14,6 +14,128 @@ function parsedata(records) {
 // Create Driver
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
+/* Functions give:
+    - all keywords with the count of all annotations (allkeywords)
+    - all keywords with the count of all databases (dbkeywords)
+    - all keywords with the count of all repositories (repokeywords)
+*/
+
+function allkeywords(req, res) {
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
+
+  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION) \
+                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
+                 ORDER BY links DESC"
+
+  const session = driver.session();
+
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(cypher_st, {
+      limit: parseInt(req.query.limit),
+      offset: parseInt(req.query.offset),
+      keyword: req.query.keyword
+    }))
+    .then(result => {
+      output = result.records.map(function(x) {
+        sampler = {
+          [x.keys[0]]: x._fields[0],
+          [x.keys[1]]: Math.max(x._fields[1])
+        }
+        return (sampler)
+      })
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: output,
+          message: 'Returned linked repositories.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(() => session.close())
+}
+
+function dbkeywords(req, res) {
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
+
+  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION)-[:Body]->(:dataCat) \
+                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
+                 ORDER BY links DESC"
+
+  const session = driver.session();
+
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(cypher_st, {
+      limit: parseInt(req.query.limit),
+      offset: parseInt(req.query.offset),
+      keyword: req.query.keyword
+    }))
+    .then(result => {
+      output = result.records.map(function(x) {
+        sampler = {
+          [x.keys[0]]: x._fields[0],
+          [x.keys[1]]: Math.max(x._fields[1])
+        }
+        return (sampler)
+      })
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: output,
+          message: 'Returned linked repositories.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(() => session.close())
+}
+
+
+function repokeywords(req, res) {
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
+
+  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION)-[:Body]->(:codeRepo) \
+                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
+                 ORDER BY links DESC"
+
+  const session = driver.session();
+
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(cypher_st, {
+      limit: parseInt(req.query.limit),
+      offset: parseInt(req.query.offset),
+      keyword: req.query.keyword
+    }))
+    .then(result => {
+      output = result.records.map(function(x) {
+        sampler = {
+          [x.keys[0]]: x._fields[0],
+          [x.keys[1]]: Math.max(x._fields[1])
+        }
+        return (sampler)
+      })
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: output,
+          message: 'Returned linked repositories.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(() => session.close())
+}
+
+
 function countDBbykw(req, res) {
 
   passedKeys = Object.keys(req.query);
@@ -251,43 +373,6 @@ function dbkeywordmix(req, res) {
     .then(() => session.close())
 }
 
-function allkeywords(req, res) {
-
-  cypher_st = "MATCH (k:KEYWORD)<-[:hasKeyword]-(n:ANNOTATION) \
-                 RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
-                 ORDER BY links DESC"
-
-  const session = driver.session();
-
-  /* First, try to find the database itself. */
-
-  const aa = session.readTransaction(tx => tx.run(cypher_st, {
-      limit: parseInt(req.query.limit),
-      offset: parseInt(req.query.offset),
-      keyword: req.query.keyword
-    }))
-    .then(result => {
-      output = result.records.map(function(x) {
-        sampler = {
-          [x.keys[0]]: x._fields[0],
-          [x.keys[1]]: Math.max(x._fields[1])
-        }
-        return (sampler)
-      })
-
-      res.status(200)
-        .json({
-          status: 'success',
-          data: output,
-          message: 'Returned linked repositories.'
-        })
-    })
-    .catch(function(err) {
-      console.error(err);
-    })
-    .then(() => session.close())
-}
-
 
 function keywordbyccdr(req, res) {
 
@@ -325,9 +410,11 @@ function keywordbyccdr(req, res) {
     .then(() => session.close())
 }
 
-module.exports.keywordbyccdr = keywordbyccdr;
-module.exports.keywords = keywords;
 module.exports.allkeywords = allkeywords;
+module.exports.dbkeywords = dbkeywords;
+module.exports.repokeywords = repokeywords;
 module.exports.reposbykw = reposbykw;
 module.exports.countDBbykw = countDBbykw;
 module.exports.dbkeywordmix = dbkeywordmix;
+module.exports.keywords = keywords;
+module.exports.keywordbyccdr = keywordbyccdr;
