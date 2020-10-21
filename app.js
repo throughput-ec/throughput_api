@@ -13,6 +13,7 @@ var swaggerUi = require('swagger-ui-express'),
 var app = express();
 
 app.use(cors());
+app.disable('etag');
 
 // create a write stream (in append mode)
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
