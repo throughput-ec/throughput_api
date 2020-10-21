@@ -8,6 +8,7 @@ router.get('/api/', function(req, res) {
   });
 });
 
+// Search endpoints associated with CCDRs:
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCcdrs(req, res);
@@ -18,25 +19,42 @@ router.get('/api/ccdr/linked', function(req, res) {
   ccdr.ccdrLinks(req, res);
 })
 
+// Search endpoints associated with CCDRs:
+router.get('/api/repo', function(req, res) {
+  var ccdr = require('./../helpers/repos/coderepo.js');
+  ccdr.searchRepo(req, res);
+})
+
+/*
+ Summary endpoints:
+ Summarizing:
+   - node type counts: '/api/summary/types'
+   - agent type counts: '/api/summary/agenttypes'
+*/
 router.get('/api/summary/types', function(req, res) {
+  // Number of annotations by OBJECT type.
   var ccdr = require('./../helpers/summary/summary.js');
   ccdr.summaryType(req, res);
 })
 
-router.get('/api/summary/ccdr', function(req, res) {
-  var ccdr = require('./../helpers/summary/summaryCcdr.js');
-  ccdr.summaryCcdr(req, res);
+router.get('/api/summary/typeagent', function(req, res) {
+  // Number of annotations by agent type.
+  var metrics = require('./../helpers/summary/summary.js');
+  metrics.summaryTypeAgent(req, res);
 })
 
-router.get('/api/summary/ccdr/keywords', function(req, res) {
-  var ccdr = require('./../helpers/summary/summaryCcdr.js');
-  ccdr.summaryCcdrkw(req, res);
-})
 
-router.get('/api/metrics/type', function(req, res) {
-  var metrics = require('./../helpers/metrics/metrics.js');
-  metrics.nodesByType(req, res);
-})
+// Currently removing implementation.  Why did I need this?
+//router.get('/api/summary/ccdr', function(req, res) {
+//  var ccdr = require('./../helpers/summary/summaryCcdr.js');
+//  ccdr.summaryCcdr(req, res);
+//})
+
+// Currently removing implementation.  Why did I need this?
+//router.get('/api/summary/ccdr/keywords', function(req, res) {
+//  var ccdr = require('./../helpers/summary/summaryCcdr.js');
+//  ccdr.summaryCcdrkw(req, res);
+//})
 
 router.get('/api/metrics/annos', function(req, res) {
   var metrics = require('./../helpers/metrics/metrics.js');
