@@ -72,12 +72,15 @@ function searchCcdrs(req, res) {
   /* First, try to find the database itself. */
   console.log(queryParam)
 
+
+
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
     .then(result => {
       console.log(result)
-    }).catch(err => {
-      console.log(err.message);
+    }).catch(() => {
+      console.log('crapo');
     })
+    .finally(() => session.close())
       /*
       const count = result.records.length;
       console.log(result)
@@ -119,7 +122,7 @@ function searchCcdrs(req, res) {
     .catch(function(err) {
       console.error(err);
     })
-    .then(() => session.close())
+
     */
 }
 
