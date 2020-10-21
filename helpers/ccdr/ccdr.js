@@ -206,7 +206,7 @@ function ccdrLinks(req, res) {
     .catch(function(err) {
       console.error(err);
     })
-    .then(() => session.close())
+    .finally(() => session.close())
 }
 
 module.exports.searchCcdrs = searchCcdrs;
