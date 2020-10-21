@@ -7,25 +7,16 @@ var pwbin = require('./../../pwbin.json')
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
 function searchCcdrs(req, res) {
-
-  passedKeys = Object.keys(req.query);
-
+  console.log('searching')
   if (req.query.search === undefined) {
     req.query.search = "";
   }
-
   if (req.query.keyword === undefined) {
     req.query.keyword = "";
   }
-
   if (req.query.limit === undefined) {
     req.query.limit = 15;
   }
-
-  if (req.query.name === undefined) {
-    req.query.name = "";
-  }
-
   if (req.query.offset === undefined) {
     req.query.offset = 0;
   }
@@ -33,8 +24,7 @@ function searchCcdrs(req, res) {
   console.log(req.query)
 
   // Query for searching for a database by name:
-
-  cypher_db = "CALL db.index.fulltext.queryNodes('namesAndDescriptions', $search) \
+  const cypher_db = "CALL db.index.fulltext.queryNodes('namesAndDescriptions', $search) \
                YIELD node, score \
                WHERE 'dataCat' IN labels(node) \
                WITH node \
@@ -47,7 +37,7 @@ function searchCcdrs(req, res) {
                SKIP toInteger($offset) \
                LIMIT toInteger($limit)"
 
-  cypher_db_kw = "MATCH (k:KEYWORD) \
+  const cypher_db_kw = "MATCH (k:KEYWORD) \
                   WHERE \
                     ((toLower(k.keyword) CONTAINS toLower($keyword) OR $keyword = '')) \
                   WITH k \
@@ -67,19 +57,23 @@ function searchCcdrs(req, res) {
 
   if (req.query.keyword == "") {
     queryCall = cypher_db;
+    queryParam = {
+        search: req.query.search,
+        limit: parseInt(req.query.limit),
+        offset: parseInt(req.query.offset),
+      }
   } else {
     queryCall = cypher_db_kw;
+    queryParam = {
+        keyword: req.query.keyword,
+        limit: parseInt(req.query.limit),
+        offset: parseInt(req.query.offset),
+      }
   }
 
   /* First, try to find the database itself. */
 
-  const aa = session.readTransaction(tx => tx.run(queryCall, {
-      search: req.query.search,
-      name: req.query.name,
-      limit: parseInt(req.query.limit),
-      offset: parseInt(req.query.offset),
-      keyword: req.query.keyword
-    }))
+  const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
     .then(result => {
       const count = result.records.length;
       console.log(count)
