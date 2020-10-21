@@ -7,7 +7,9 @@ var pwbin = require('./../../pwbin.json')
 const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
 
 function searchCcdrs(req, res) {
+
   console.log('searching')
+
   if (req.query.search === undefined) {
     req.query.search = "";
   }
@@ -70,7 +72,7 @@ function searchCcdrs(req, res) {
         offset: parseInt(req.query.offset),
       }
   }
-
+console.log(queryParam)
   /* First, try to find the database itself. */
 
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
