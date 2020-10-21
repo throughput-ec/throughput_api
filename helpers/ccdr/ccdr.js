@@ -75,7 +75,8 @@ function searchCcdrs(req, res) {
 
 
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
-    .then(result => {
+
+  aa.then(result => {
       console.log(result)
     }).catch(() => {
       console.log('crapo');
