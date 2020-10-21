@@ -75,6 +75,8 @@ function searchCcdrs(req, res) {
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
     .then(result => {
       console.log(result)
+    }).catch(err => {
+    console.log(err);
     })
       /*
       const count = result.records.length;
