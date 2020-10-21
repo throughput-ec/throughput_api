@@ -72,13 +72,12 @@ function searchCcdrs(req, res) {
         offset: parseInt(req.query.offset),
       }
   }
-console.log(queryParam)
   /* First, try to find the database itself. */
 
   const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
     .then(result => {
-      const count = result.records.length;
-      console.log(count)
+      //const count = result.records.length;
+      console.log(result)
       var db = '';
 
       if (count === 0) {
