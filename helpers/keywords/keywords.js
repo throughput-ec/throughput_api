@@ -274,18 +274,24 @@ function keywords(req, res) {
     req.query.limit = 15;
   }
 
+  if (req.query.limit > 50) {
+    req.query.limit = 50;
+  }
+
   if (req.query.offset === undefined) {
     req.query.offset = 0;
   }
 
-  cypher_st = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(o:dataCat|codeRepo) \
-                 WHERE toLower(k.keyword) CONTAINS toLower($keyword) \
-                 WITH o \
-                 MATCH (o)-[]-(:ANNOTATION)-[]-(a:KEYWORD) \
-                 RETURN DISTINCT toLower(a.keyword) AS keyword, COUNT(toLower(a.keyword)) AS resources \
-                 ORDER BY resources DESC \
-                 SKIP toInt($offset) \
-                 LIMIT toInt($limit)"
+  cypher_st = "MATCH (k:KEYWORD) \
+               WHERE toLower(k.keyword) CONTAINS toLower($keyword) \
+               WITH k \
+               MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[]-(o) \
+               WHERE o:dataCat OR o:codeRepo \
+               WITH o, k \
+               RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(DISTINCT o) AS resources \
+               ORDER BY resources DESC \
+               SKIP toInteger($offset) \
+               LIMIT toInteger($limit)"
 
   const session = driver.session();
 

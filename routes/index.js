@@ -39,8 +39,8 @@ router.get('/api/summary/types', function(req, res) {
 
 router.get('/api/summary/typeagent', function(req, res) {
   // Number of annotations by agent type.
-  var metrics = require('./../helpers/summary/summary.js');
-  metrics.summaryTypeAgent(req, res);
+  var summary = require('./../helpers/summary/summary.js');
+  summary.summaryTypeAgent(req, res);
 })
 
 // Keywords
@@ -84,8 +84,8 @@ router.get('/api/keyword/dbs/count', function(req, res) {
 //})
 
 router.get('/api/metrics/annos', function(req, res) {
-  var metrics = require('./../helpers/metrics/metrics.js');
-  metrics.totalAnnot(req, res);
+  var annotationMetrics = require('./../helpers/metrics/metrics.js');
+  annotationMetrics.totalAnnot(req, res);
 })
 
 router.get('/api/metrics/annos/users', function(req, res) {
