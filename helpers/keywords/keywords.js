@@ -385,7 +385,7 @@ function keywordbyccdr(req, res) {
   passedKeys = Object.keys(req.query);
 
 
-  query = " MATCH (k: KEYWORD)-[]-(:ANNOTATION)-[]-(o:OBJECT) \
+  query = "MATCH (k: KEYWORD)-[]-(:ANNOTATION)-[]-(o:dataCat) \
     WHERE o.id = $ccrd \
     RETURN DISTINCT k.keyword AS keyword"
 
@@ -416,6 +416,42 @@ function keywordbyccdr(req, res) {
     .then(() => session.close())
 }
 
+function keywordbyrepo(req, res) {
+
+  passedKeys = Object.keys(req.query);
+
+
+  query = "MATCH (k: KEYWORD)-[]-(:ANNOTATION)-[]-(o:codeRepo) \
+    WHERE o.id = $repo \
+    RETURN DISTINCT k.keyword AS keyword"
+
+  const session = driver.session();
+
+  /* First, try to find the database itself. */
+
+  const aa = session.readTransaction(tx => tx.run(query, {
+      repo: req.params.repo
+    }))
+    .then(result => {
+      console.log(result.records)
+
+      output = result.records.map(x => parsedata(x))
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            keywords: output
+          },
+          message: 'Returned linked keywords.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .then(() => session.close())
+}
+
 module.exports.allkeywords = allkeywords;
 module.exports.dbkeywords = dbkeywords;
 module.exports.repokeywords = repokeywords;
@@ -424,3 +460,4 @@ module.exports.countDBbykw = countDBbykw;
 module.exports.dbkeywordmix = dbkeywordmix;
 module.exports.keywords = keywords;
 module.exports.keywordbyccdr = keywordbyccdr;
+module.exports.keywordbyrepo = keywordbyrepo;
