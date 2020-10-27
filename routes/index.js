@@ -103,9 +103,14 @@ router.get('/api/keyword', function(req, res) {
   query.keywords(req, res);
 })
 
-router.get('/api/keyword/repo/:ccdr', function(req, res) {
+router.get('/api/keyword/ccdr/:ccdr', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.keywordbyccdr(req, res);
+})
+
+router.get('/api/keyword/repos/:repo', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.keywordbyrepo(req, res);
 })
 
 router.get('/api/keyword/repos/', function(req, res) {
