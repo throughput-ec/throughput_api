@@ -92,11 +92,11 @@ paths:
       parameters:
         - in:                 path
           name:               repoid
-          description:        A unique database identifier.
+          description:        A unique GitHub repository identifier.
           required:           true
           schema:
             type:             string
-            example:  r3d100011761
+            example:  52386946
       responses:
         '200':
           description:        keywords matching the search criteria.
