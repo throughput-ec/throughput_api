@@ -1,17 +1,16 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/api/', function(req, res) {
-  res.render('index', {
-    title: 'Annotation API Engine'
-  });
-});
-
 // Search endpoints associated with CCDRs:
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCcdrs(req, res);
+})
+
+// Search endpoints associated with CCDRs:
+router.post('/api/ann', function(req, res) {
+  var widget = require('./../helpers/postannotation/datanote.js');
+  widget.datanote;
 })
 
 router.get('/api/ccdr/linked', function(req, res) {
