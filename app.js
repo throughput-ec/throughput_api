@@ -12,7 +12,7 @@ var swaggerUi = require('swagger-ui-express'),
 
 var app = express();
 
-app.use(cors());
+app.use(cors({credentials: true, origin: true}))
 
 // create a write stream (in append mode)
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
@@ -33,7 +33,7 @@ var users = require('./routes/users');
 var debug = require('debug')('app4')
 
 var options = {
-  swaggerUrl: 'http://throughputdb.com/api-docs',
+  swaggerUrl: 'https://throughputdb.com/api-docs',
   customCssUrl: '/custom.css'
 }
 
