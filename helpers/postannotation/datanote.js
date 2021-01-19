@@ -1,85 +1,129 @@
 // Require Neo4j
-const neo4j = require('neo4j-driver').v1;
+const neo4j = require('neo4j-driver');
+var fs = require('fs');
+const path = require('path');
 
 var pwbin = require('./../../pwbin.json')
 
 // Create Driver
-const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
+const driver = new neo4j.driver(pwbin.host,
+  neo4j.auth.basic(pwbin.user, pwbin.password), {
+    disableLosslessIntegers: true
+  });
+const session = driver.session();
 
-function datanote (req, res) {
-  // A post function to add a note to a data record.
-  const session = driver.session();
+function cleanStats(result) {
+  stats = result['summary']['counters']['_stats']
+  output = Object.keys(stats)
+    .filter(x => stats[x] > 0)
+    .reduce((obj, key) => {
+      obj[key] = stats[key];
+    return obj;
+      }, {});
+  return output;
+}
 
-  // Target can be one or many objects.  Right now only a single object is accepted.
+function checktoken(token) {
 
-  var tarinp = (function (raw) {
-    try {
-      return JSON.parse(raw);
-    } catch(err) {
-      res.status(500)
-        .json({
-          status: 'error',
-          data: null,
-          message: 'Target element not passed as valid JSON.'
-        });
-    }
-  })(req.query.url);
+  console.log('Checking token ' + token)
+  output = session.run('MATCH (tk:TOKEN) WHERE tk.token = $token RETURN COUNT(tk) AS count', {
+      'token': token
+    })
+    .then(result => {
+      output = result.records[0].get(0)
+      if (output > 0) {
+        var response = 1
+      } else {
+        response = 0
+      }
+      console.log(response)
+      return response
+    });
+  return output;
+}
 
-  if (typeof tarinp === 'object') {
-    var target = tarinp;
-  } else {
-    var target = [].concat(tarinp);
+function checkdb(dbid) {
+
+  console.log('Checking dbid ' + dbid)
+  output = session.run('MATCH (dc:dataCat) WHERE dc.id = $dbid RETURN COUNT(dc) AS count', {
+      'dbid': dbid
+    })
+    .then(result => {
+      output = result.records[0].get(0)
+      if (output > 0) {
+        var response = 1
+      } else {
+        response = 0
+      }
+      console.log(response)
+      return response
+    });
+  return output;
+}
+
+function datanote(req, res) {
+
+  input = {
+    dbid: req.body.dbid,
+    orcid: req.body.orcid,
+    level: req.body.level,
+    dataid: req.body.dataid,
+    body: req.body.body,
+    token: req.body.token
   }
-
-  var body   = req.query.body;
-  var url    = JSON.parse(req.query.url);
-  var meta   = req.query.meta;
-  var person = req.query.person;
 
   var orcid = new RegExp("^(\\d{4}-\\d{4}-\\d{4}-\\d{3}[X|\\d])$");
 
-  const cypher = `
-  CREATE (a:Annotation { created: timestamp() })
-
-  MERGE (p:Person {id: {person}})
-    ON CREATE SET p.created = timestamp()
-
-  MERGE (b:Object {value: {body}})
-    ON CREATE SET b.created = timestamp()
-
-  MERGE (c:Object {url: {url}})
-    ON CREATE SET c.created = timestamp()
-
-  MERGE (p)-[:creates]->(a)-[:annotates]->(b)
-
-  MERGE (a)-[:annotates]->(c)
-  `
-
-  // Person is valid if an ORCID regex resolves.
-
-  if (!orcid.test(person)) {
-    res.status(500)
-      .json({
-        status: 'error',
-        data: null,
-        message: 'Posting user does not have a valid ORCID.'
-      });
-  };
-
-  target.map(function(x) {
-    console.log(x)
-    session.run(cypher, {person: person, body: body, url: x})
+  checktoken(input.token)
     .then(result => {
-      res.status(200)
-        .json({
-          status: 'success',
-          data: result,
-          message: 'Posted note'
-        });
-      session.close();
+      if (result == 0) {
+        res.status(500)
+          .json({
+            status: 'error',
+            data: null,
+            message: 'Post does not contain a valid token in the BODY token.'
+          });
+      } else {
+        // Person is valid if an ORCID regex resolves.
+        checkdb(input.dbid)
+          .then(result => {
+            if (result == 0) {
+              res.status(500)
+                .json({
+                  status: 'error',
+                  data: null,
+                  message: 'Post does not contain a valid database ID.'
+                });
+            } else {
+              if (!orcid.test(req.body.orcid)) {
+                res.status(500)
+                  .json({
+                    status: 'error',
+                    data: null,
+                    message: 'Posting user does not have a valid ORCID.'
+                  });
+              } else {
+                // Everything works and we can do our work with the database:
+                const fullPath = path.join(__dirname, 'agent_post.cql');
+                var textByLine = fs.readFileSync(fullPath).toString()
+                session.run(textByLine, input)
+                  .then(result => {
+                    output = {'modifications': cleanStats(result),
+                              'parameters': input}
+                    res.status(200)
+                      .json({
+                        status: 'success',
+                        data: output,
+                        message: 'Posted note'
+                      });
+                    session.close();
+                  });
+              }
+            }
+          });
+      }
     });
-  });
-
 }
 
 module.exports.datanote = datanote;
+module.exports.checktoken = checktoken;

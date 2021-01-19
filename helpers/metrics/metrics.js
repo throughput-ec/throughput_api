@@ -182,10 +182,11 @@ function topUsers(req, res) {
 function totalAnnot(req, res) {
 
   annos = "MATCH (n:ANNOTATION) \
-             WITH date(datetime({epochmillis:n.created})) AS date \
-             RETURN DISTINCT date.weekYear AS year, date.week AS week, COUNT(date) AS count \
-             ORDER BY year DESC, week DESC \
-             LIMIT 10"
+            WITH COALESCE(n.created, 1) AS testdt \
+            WITH date(datetime({epochmillis:testdt})) AS date \
+           RETURN DISTINCT date.weekYear AS year, date.week AS week, COUNT(date) AS count \
+           ORDER BY year DESC, week DESC \
+           LIMIT 10"
 
   const session = driver.session();
 

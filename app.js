@@ -12,7 +12,7 @@ var swaggerUi = require('swagger-ui-express'),
 
 var app = express();
 
-app.use(cors());
+app.use(cors({credentials: true, origin: true}))
 
 // create a write stream (in append mode)
 var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
@@ -33,12 +33,11 @@ var users = require('./routes/users');
 var debug = require('debug')('app4')
 
 var options = {
-  swaggerUrl: 'http://throughputdb.com/api-docs',
+  swaggerUrl: 'https://throughputdb.com/api-docs',
   customCssUrl: '/custom.css'
 }
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -46,16 +45,18 @@ app.set('view engine', 'pug');
 
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({
-  extended: true
+  extended: false
 }));
+
+app.use(bodyParser.json());
+app.use(bodyParser.raw());
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-
 
 // development error handler
 // will print stacktrace

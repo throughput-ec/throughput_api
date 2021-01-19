@@ -1,17 +1,27 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/api/', function(req, res) {
-  res.render('index', {
-    title: 'Annotation API Engine'
-  });
-});
+var bodyParser  =  require("body-parser");
+router.use(bodyParser.urlencoded({ extended: false }));
+
+var jsonParser = bodyParser.json()
+
+router.post('/api/widget', function(req, res) {
+  console.log('yes!')
+  var widget = require('./../helpers/postannotation/datanote.js')
+  widget.datanote(req, res)
+})
 
 // Search endpoints associated with CCDRs:
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCcdrs(req, res);
+})
+
+// Search endpoints associated with CCDRs:
+router.get('/api/ann', function(req, res) {
+  var widget = require('./../helpers/postannotation/datanote.js');
+  widget.datanote;
 })
 
 router.get('/api/ccdr/linked', function(req, res) {
@@ -39,37 +49,44 @@ router.get('/api/summary/types', function(req, res) {
 
 router.get('/api/summary/typeagent', function(req, res) {
   // Number of annotations by agent type.
-  var metrics = require('./../helpers/summary/summary.js');
-  metrics.summaryTypeAgent(req, res);
+  var summary = require('./../helpers/summary/summary.js');
+  summary.summaryTypeAgent(req, res);
 })
 
 // Keywords
-router.get('/api/keyword/all', function(req, res) {
+router.get('/api/keywords/all', function(req, res) {
   // Returns all keywords and counts of associated objects.
   var query = require('./../helpers/keywords/keywords.js');
   query.allkeywords(req, res);
 })
 
-router.get('/api/keyword/all/ccdr', function(req, res) {
+router.get('/api/keywords/all/ccdrs', function(req, res) {
   // Returns all database keywords and counts of associated objects.
   var query = require('./../helpers/keywords/keywords.js');
-  query.dbkeywords(req, res);
+  query.ccdrkeywords(req, res);
 })
 
-router.get('/api/keyword/all/repo', function(req, res) {
+router.get('/api/keywords/all/repos', function(req, res) {
   // Returns all database keywords and counts of associated objects.
   var query = require('./../helpers/keywords/keywords.js');
   query.repokeywords(req, res);
 })
 
-
-router.get('/api/keyword/dbs/count', function(req, res) {
-  // Returns all keywords associated with data catalogs.
+router.get('/api/keywords', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
-  query.countDBbykw(req, res);
+  query.keywords(req, res);
 })
 
+router.get('/api/keywords/ccdrs/:ccdr', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.keywordsbyccdr(req, res);
+})
 
+router.get('/api/keywords/repos/:repo', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.keywordsbyrepo(req, res);
+
+})
 
 // Currently removing implementation.  Why did I need this?
 //router.get('/api/summary/ccdr', function(req, res) {
@@ -84,8 +101,8 @@ router.get('/api/keyword/dbs/count', function(req, res) {
 //})
 
 router.get('/api/metrics/annos', function(req, res) {
-  var metrics = require('./../helpers/metrics/metrics.js');
-  metrics.totalAnnot(req, res);
+  var annotationMetrics = require('./../helpers/metrics/metrics.js');
+  annotationMetrics.totalAnnot(req, res);
 })
 
 router.get('/api/metrics/annos/users', function(req, res) {
@@ -93,40 +110,20 @@ router.get('/api/metrics/annos/users', function(req, res) {
   metrics.topUsers(req, res);
 })
 
-router.get('/api/repo', function(req, res) {
+router.get('/api/repos', function(req, res) {
   var ccdr = require('./../helpers/searchRepo/coderepo.js');
   ccdr.searchRepo(req, res);
 })
 
-router.get('/api/keyword', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.keywords(req, res);
-})
-
-router.get('/api/keyword/repo/:ccdr', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.keywordbyccdr(req, res);
-})
-
-router.get('/api/keyword/repos/', function(req, res) {
+router.get('/api/repos/', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.reposbykw(req, res);
 })
 
-router.get('/api/keyword/dbs/count', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.countDBbykw(req, res);
-})
-
-router.get('/api/keyword/dbs/linked', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.dbkeywordmix(req, res);
-})
-
-router.post('/api/datanote', function(req, res) {
-  var notes = require('./../helpers/postannotation/datanote.js');
-  notes.datanote(req, res);
-})
+// router.get('/api/keyword/dbs/linked', function(req, res) {
+//   var query = require('./../helpers/keywords/keywords.js');
+//   query.dbkeywordmix(req, res);
+// })
 
 router.get('/api/citations', function(req, res) {
   var cite = require('./../helpers/citation/citation.js');

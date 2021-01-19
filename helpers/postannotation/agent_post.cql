@@ -1,18 +1,29 @@
 // Based on Web Annotation Example 12:
 // https://www.w3.org/TR/annotation-model/#agents
 
-MERGE (ob:OBJECT { id:$body})
-ON CREATE SET ob.created = timestamp()
-MERGE (ag:AGENT { id:$orcid}) <-[:isAgentType]- (:AGENTTYPE {type:"Person"})
+MATCH (ats:AGENTTYPE {type:"SoftwareAgent"})
+MATCH (agt:AGENTTYPE {type:"Person"})
+MATCH (db:dataCat {id: $dbid })
+MATCH (dsty:TYPE {type:'Dataset'})
+MATCH (tyb:TYPE {type:'TextualBody'})
+WITH ats, agt, db, dsty, tyb
+MERGE (ag:AGENT { id:$orcid })
 ON CREATE SET ag.created = timestamp()
+MERGE (ag)<-[:isAgentType]-(agt)
 MERGE (ags:AGENT { id:"http://throughputdb.com/",
-                  name: "API v0.1",
-                  homepage: "http://throughputdb.com"}) <-[:isAgentType]- (:AGENTTYPE {type:"Software"})
+                  name: "API v0.1 Annotation Widget",
+                  homepage: "http://throughputdb.com"})
 ON CREATE SET ags.created = timestamp()
-WITH ob, ags, ag
-MERGE (ag)-[:Created {created: timestamp()}]->(a:ANNOTATION {created: timestamp()})-[:Body]->(ob)
-MERGE (ags)-[:Generated {generated: timestamp()}]->(a)
-WITH a
-MERGE (ot:OBJECT {id: $target})
-ON CREATE SET ot.created = timestamp()
-CREATE (ot)<-[:Target]-(a)
+MERGE (ags)<-[:isAgentType]-(ats)
+MERGE (ds:OBJECT {datesetid: $dataid, level: $level})
+MERGE (ds)-[:isType]->(dsty)
+MERGE (ds)<-[:Contains]-(db)
+WITH ds, ag, ags, tyb
+CREATE (a:ANNOTATION {created: timestamp(), test: True})
+CREATE (a)-[:Target]->(ds)
+CREATE (a)-[:Generated]->(ags)
+CREATE (a)-[:Created]->(ag)
+WITH a, tyb
+CREATE (ob:OBJECT { value: $body, created: timestamp()})
+MERGE (ob)-[:Type]->(tyb)
+MERGE (ob)<-[:Body]-(a)
