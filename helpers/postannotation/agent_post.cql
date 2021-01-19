@@ -11,7 +11,7 @@ MERGE (ag:AGENT { id:$orcid })
 ON CREATE SET ag.created = timestamp()
 MERGE (ag)<-[:isAgentType]-(agt)
 MERGE (ags:AGENT { id:"http://throughputdb.com/",
-                  name: "API v0.1",
+                  name: "API v0.1 Annotation Widget",
                   homepage: "http://throughputdb.com"})
 ON CREATE SET ags.created = timestamp()
 MERGE (ags)<-[:isAgentType]-(ats)

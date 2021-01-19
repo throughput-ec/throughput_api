@@ -1,6 +1,17 @@
 var express = require('express');
 var router = express.Router();
 
+var bodyParser  =  require("body-parser");
+router.use(bodyParser.urlencoded({ extended: false }));
+
+var jsonParser = bodyParser.json()
+
+router.post('/api/widget', function(req, res) {
+  console.log('yes!')
+  var widget = require('./../helpers/postannotation/datanote.js')
+  widget.datanote(req, res)
+})
+
 // Search endpoints associated with CCDRs:
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
@@ -8,7 +19,7 @@ router.get('/api/ccdr', function(req, res) {
 })
 
 // Search endpoints associated with CCDRs:
-router.post('/api/ann', function(req, res) {
+router.get('/api/ann', function(req, res) {
   var widget = require('./../helpers/postannotation/datanote.js');
   widget.datanote;
 })
@@ -113,11 +124,6 @@ router.get('/api/repos/', function(req, res) {
 //   var query = require('./../helpers/keywords/keywords.js');
 //   query.dbkeywordmix(req, res);
 // })
-
-router.post('/api/datanote', function(req, res) {
-  var notes = require('./../helpers/postannotation/datanote.js');
-  notes.datanote(req, res);
-})
 
 router.get('/api/citations', function(req, res) {
   var cite = require('./../helpers/citation/citation.js');
