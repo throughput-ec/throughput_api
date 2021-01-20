@@ -83,6 +83,11 @@ router.get('/api/keywords', function(req, res) {
   query.keywords(req, res);
 })
 
+router.get('/api/keywords', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.keywords(req, res);
+})
+
 router.get('/api/keywords/ccdrs/:ccdr', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.keywordsbyccdr(req, res);
