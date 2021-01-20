@@ -66,7 +66,7 @@ router.get('/api/keywords/all/ccdrs', function(req, res) {
   query.ccdrkeywords(req, res);
 })
 
-router.get('/api/keyword/all/ccdrs', function(req, res) {
+router.get('/api/keyword/all/ccdr', function(req, res) {
   // Returns all database keywords and counts of associated objects.
   var query = require('./../helpers/keywords/keywords.js');
   query.ccdrkeywords(req, res);
