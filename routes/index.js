@@ -83,7 +83,7 @@ router.get('/api/keywords', function(req, res) {
   query.keywords(req, res);
 })
 
-router.get('/api/keywords', function(req, res) {
+router.get('/api/keyword', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.keywords(req, res);
 })
@@ -97,6 +97,11 @@ router.get('/api/keywords/repos/:repo', function(req, res) {
   var query = require('./../helpers/keywords/keywords.js');
   query.keywordsbyrepo(req, res);
 
+})
+
+router.get('/api/keyword/repos/:repo', function(req, res) {
+  var query = require('./../helpers/keywords/keywords.js');
+  query.keywordsbyrepo(req, res);
 })
 
 // Currently removing implementation.  Why did I need this?
