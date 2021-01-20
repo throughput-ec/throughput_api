@@ -70,18 +70,13 @@ function ccdrkeywords(req, res) {
                MATCH (db:dataCat) \
                MATCH (k)<-[:hasKeyword]-(n:ANNOTATION)-[:Body]->(db) \
                RETURN DISTINCT toLower(k.keyword) AS keyword, COUNT(n) AS links \
-               ORDER BY links DESC \
-               LIMIT $limit"
+               ORDER BY links DESC"
 
   const session = driver.session();
 
   /* First, try to find the database itself. */
 
-  const aa = session.readTransaction(tx => tx.run(cypher_st, {
-      limit: parseInt(req.query.limit),
-      offset: parseInt(req.query.offset),
-      keyword: req.query.keyword
-    }))
+  const aa = session.readTransaction(tx => tx.run(cypher_st))
     .then(result => {
       output = result.records.map(function(x) {
         sampler = {
@@ -116,11 +111,7 @@ function repokeywords(req, res) {
 
   /* First, try to find the database itself. */
 
-  const aa = session.readTransaction(tx => tx.run(cypher_st, {
-      limit: parseInt(req.query.limit),
-      offset: parseInt(req.query.offset),
-      keyword: req.query.keyword
-    }))
+  const aa = session.readTransaction(tx => tx.run(cypher_st))
     .then(result => {
       output = result.records.map(function(x) {
         sampler = {
