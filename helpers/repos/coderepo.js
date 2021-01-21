@@ -56,12 +56,12 @@ function searchRepo(req, res) {
                          n.url AS url, \
                          toInteger(SIZE(COLLECT(o))) AS dbs \
                   ORDER BY dbs DESC \
-                  SKIP toInteger(offset) \
-                  LIMIT toInteger(limit)"
+                  SKIP toInteger($offset) \
+                  LIMIT toInteger($limit)"
 
   const session = driver.session();
 
-  if (req.query.keyword == "") {
+  if (req.query.keywords == "") {
     queryCall = cypher_db;
   } else {
     queryCall = cypher_db_kw;
