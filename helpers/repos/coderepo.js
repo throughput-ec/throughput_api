@@ -4,7 +4,8 @@ const neo4j = require('neo4j-driver');
 var pwbin = require('./../../pwbin.json')
 
 // Create Driver
-const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
+const driver = new neo4j.driver(pwbin.host,
+  neo4j.auth.basic(pwbin.user, pwbin.password));
 
 function searchRepo(req, res) {
 
@@ -29,8 +30,6 @@ function searchRepo(req, res) {
   if (req.query.offset === undefined) {
     req.query.offset = 0;
   }
-
-  console.log(req.query)
 
   cypher_db = "CALL db.index.fulltext.queryNodes('namesAndDescriptions', $search) \
                YIELD node, score \
@@ -76,7 +75,7 @@ function searchRepo(req, res) {
     }))
     .then(result => {
       const count = result.records.length;
-      console.log(count)
+      
       var repo = '';
 
       if (count === 0) {
@@ -91,8 +90,6 @@ function searchRepo(req, res) {
             message: 'No code repositories match the supplied search string: ' + req.query.search
           })
       } else {
-        console.log(result.records)
-
         output = result.records.map(function(x) {
 
           return {
@@ -113,10 +110,10 @@ function searchRepo(req, res) {
           })
       }
     })
-    .then(x => driver.close())
     .catch(function(err) {
       console.error(err);
     })
+    .finally(x => session.close())
 }
 
 module.exports.searchRepo = searchRepo;
