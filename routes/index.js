@@ -6,6 +6,14 @@ router.use(bodyParser.urlencoded({ extended: false }));
 
 var jsonParser = bodyParser.json()
 
+// Keywords
+router.get('/api/keywords', function(req, res) {
+  // Returns all keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.allkeywords(req, res);
+})
+
+
 router.post('/api/widget', function(req, res) {
   console.log('yes!')
   var widget = require('./../helpers/postannotation/datanote.js')
@@ -51,57 +59,6 @@ router.get('/api/summary/typeagent', function(req, res) {
   // Number of annotations by agent type.
   var summary = require('./../helpers/summary/summary.js');
   summary.summaryTypeAgent(req, res);
-})
-
-// Keywords
-router.get('/api/keywords/all', function(req, res) {
-  // Returns all keywords and counts of associated objects.
-  var query = require('./../helpers/keywords/keywords.js');
-  query.allkeywords(req, res);
-})
-
-router.get('/api/keywords/all/ccdrs', function(req, res) {
-  // Returns all database keywords and counts of associated objects.
-  var query = require('./../helpers/keywords/keywords.js');
-  query.ccdrkeywords(req, res);
-})
-
-router.get('/api/keyword/all/ccdr', function(req, res) {
-  // Returns all database keywords and counts of associated objects.
-  var query = require('./../helpers/keywords/keywords.js');
-  query.ccdrkeywords(req, res);
-})
-
-router.get('/api/keywords/all/repos', function(req, res) {
-  // Returns all database keywords and counts of associated objects.
-  var query = require('./../helpers/keywords/keywords.js');
-  query.repokeywords(req, res);
-})
-
-router.get('/api/keywords', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.keywords(req, res);
-})
-
-router.get('/api/keyword', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.keywords(req, res);
-})
-
-router.get('/api/keywords/ccdrs/:ccdr', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.keywordsbyccdr(req, res);
-})
-
-router.get('/api/keywords/repos/:repo', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.keywordsbyrepo(req, res);
-
-})
-
-router.get('/api/keyword/repos/:repo', function(req, res) {
-  var query = require('./../helpers/keywords/keywords.js');
-  query.keywordsbyrepo(req, res);
 })
 
 // Currently removing implementation.  Why did I need this?
@@ -150,6 +107,5 @@ router.get('/api/db/annotations', function(req, res) {
   var dbanno = require('./../helpers/searchAnnotations/datasetAnnotation.js');
   dbanno.databaseAnnotation(req, res);
 })
-
 
 module.exports = router;
