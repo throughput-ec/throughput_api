@@ -1,5 +1,5 @@
-// We want to match keywords based on one or more comma separated elements
-// that are passed in as an array.
+// We want to match data catalogs using keywords based on one or more comma
+// separated elements that are passed in as an array.
 // We also want to have the ability to filter by object types.
 // First we unwind the keywords (allowing an array of potential keywords)
 // Then we check if people want types of a particular label (Article, code repo)
@@ -15,9 +15,8 @@ UNWIND $keywords AS kws
     {kws:kws}) YIELD value
 WITH DISTINCT value.keywords AS keywords
 MATCH (keywords)<-[:hasKeyword]-(n:ANNOTATION)-[:Body]-(o:dataCat)
-OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(n:codeRepo)
-WITH DISTINCT properties(o) AS database, COLLECT(DISTINCT keywords.keyword) AS keywords, SIZE(COLLECT(n)) AS repos
-RETURN database.name, database.description, database.id, database.url, keywords, repos
-ORDER BY repos DESC
+WITH DISTINCT keywords.keyword AS keywords, count(n) AS count
+RETURN keywords, count
+ORDER BY count DESC
 SKIP toInteger($offset)
 LIMIT toInteger($limit)
