@@ -14,13 +14,13 @@ CALL apoc.when($name <> "",
    WHERE o.name CONTAINS($name)
    MATCH (kws)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o)
    RETURN DISTINCT o AS repo",
-  "MATCH (kws)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o:codeRepo)
+  "MATCH (kws)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o:dataCat)
    MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o)
-   OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(db:dataCat)
-   RETURN DISTINCT o AS repo, COLLECT(DISTINCT k.keyword) AS keywords, COUNT(db) AS count",
-  {name:$name, kws:keywords}) YIELD value AS values
-WITH values.repo AS repo, values.keywords AS keywords, values.count AS count
-RETURN DISTINCT properties(repo) AS repos, [x IN keywords WHERE x IN $keywords] AS keywords, count
+   OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(cr:codeRepo)
+   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT k.keyword) AS keywords, COUNT(cr) AS count",
+   {name:$name, kws:keywords}) YIELD value AS values
+WITH values.ccdr AS ccdr, values.keywords AS keywords, values.count AS count
+RETURN DISTINCT properties(ccdr) AS ccdrs, [x IN keywords WHERE x IN $keywords] AS keywords, count
 ORDER BY SIZE(keywords) DESC, count DESC
 SKIP toInteger($offset)
 LIMIT toInteger($limit)

@@ -16,7 +16,6 @@ function parsedata(records) {
     }
     return out;
   })
-
   return test;
 }
 
@@ -51,9 +50,18 @@ function searchRepo(req, res) {
     params.keywords = params.keywords.split(',')
   }
 
+  const session = driver.session();
+
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
-      output = parsedata(result.records)
+      output = parsedata(result.records).map(x=> {
+        var repo = x.repos
+        if (Object.keys(repo).includes('meta')) {
+          repo.meta = JSON.parse(repo.meta)
+        };
+        return repo;
+      });
+
       res.status(200)
         .json({
           status: 'success',

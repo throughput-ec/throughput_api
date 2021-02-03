@@ -1,207 +1,76 @@
-// Require Neo4j
 const neo4j = require('neo4j-driver');
+var fs = require('fs');
+const path = require('path');
 
 var pwbin = require('./../../pwbin.json')
 
+function parsedata(records) {
+  // Takes in the fields from neo4j and turns them into a named object
+  // Otherwise the keys and field values are split into different objects.
+  var test = records.map(x => {
+    var out = {}
+    for (i = 0; i < x.keys.length; i++) {
+      out[x.keys[i]] = x._fields[i];
+    }
+    return out;
+  })
+  return test;
+}
+
 // Create Driver
-const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.password));
+const driver = new neo4j.driver(pwbin.host,
+  neo4j.auth.basic(pwbin.user, pwbin.password), {
+    disableLosslessIntegers: true
+  });
 
-function searchCcdrs(req, res) {
+function searchCCDR(req, res) {
 
-  if (req.query.search === undefined) {
-    req.query.search = "";
-  }
-  if (req.query.keyword === undefined) {
-    req.query.keyword = "";
-  }
-  if (req.query.limit === undefined) {
-    req.query.limit = 15;
-  }
-  if (req.query.offset === undefined) {
-    req.query.offset = 0;
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
+
+  const fullPath = path.join(__dirname, 'cql/searchCCDR.cql');
+  var textByLine = fs.readFileSync(fullPath).toString()
+
+  params = {
+    'keywords': [''],
+    'name': '',
+    'offset': 0,
+    'limit': 25
   }
 
-  // Query for searching for a database by name:
-  const cypher_db = "CALL db.index.fulltext.queryNodes('namesAndDescriptions', $search) \
-               YIELD node, score \
-               WHERE 'dataCat' IN labels(node) \
-               WITH node \
-               OPTIONAL MATCH (node)<-[:Target]-(:ANNOTATION)-[:Target]->(o:codeRepo) \
-               RETURN DISTINCT node.id as id, \
-                               node.name AS name, \
-                               node.description AS description, \
-                               node.url AS url, \
-                               toInteger(SIZE(COLLECT(o))) AS code \
-               SKIP toInteger($offset) \
-               LIMIT toInteger($limit)"
-
-  const cypher_db_kw = "MATCH (k:KEYWORD) \
-                  WHERE \
-                    ((toLower(k.keyword) CONTAINS toLower($keyword) OR $keyword = '')) \
-                  WITH k \
-                  MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(n:dataCat) \
-                  WITH DISTINCT n \
-                  OPTIONAL MATCH (n)<-[:Target]-(:ANNOTATION)-[:Target]->(o:codeRepo) \
-                  RETURN DISTINCT n.id as id, \
-                                  n.name AS name, \
-                                  n.description AS description, \
-                                  n.url AS url, \
-                                  toInteger(SIZE(COLLECT(o))) AS code \
-                  ORDER BY code DESC \
-                  SKIP toInteger($offset) \
-                  LIMIT toInteger($limit)"
+  Object.keys(params).map(x => {
+    if (!!req.query[x]) {
+      params[x] = req.query[x]
+    } else {
+      params[x] = params[x]
+    }
+  })
+  if (params.keywords !== ['']) {
+    params.keywords = params.keywords.split(',')
+  }
 
   const session = driver.session();
 
-  if (req.query.keyword == "") {
-    queryCall = cypher_db;
-    queryParam = {
-        search: req.query.search,
-        limit: parseInt(req.query.limit),
-        offset: parseInt(req.query.offset),
-      }
-  } else {
-    queryCall = cypher_db_kw;
-    queryParam = {
-        keyword: req.query.keyword,
-        limit: parseInt(req.query.limit),
-        offset: parseInt(req.query.offset),
-      }
-  }
-
-  /* First, try to find the database itself. */
-  console.log(queryParam)
-
-
-
-  const aa = session.readTransaction(tx => tx.run(queryCall, queryParam))
-
-  aa.then(result => {
-      const count = result.records.length;
-      console.log(result)
-      var db = '';
-
-      if (count === 0) {
-        res.status(200)
-          .json({
-            status: 'success',
-            data: {
-              count: 0,
-              database: null,
-              repos: null
-            },
-            message: 'No databases match the supplied search string: ' + req.query.search
-          })
-      } else {
-        console.log(result.records)
-
-        output = result.records.map(function(x) {
-          return {
-            id: x['_fields'][0],
-            name: x['_fields'][1],
-            description: x['_fields'][2],
-            url: x['_fields'][3],
-            repos: Math.max(x['_fields'][4])
-          }
-        })
-        res.status(200)
-          .json({
-            status: 'success',
-            data: {
-              ccdrs: output
-            },
-            message: 'Returned linked repositories.'
-          })
-      }
-    })
-    .catch(function(err) {
-      console.error(err);
-    })
-    .finally(() => session.close())
-
-}
-
-function ccdrLinks(req, res) {
-
-  passedKeys = Object.keys(req.query);
-
-  if (req.query.limit === undefined) {
-    req.query.limit = 100;
-  }
-
-  if (req.query.id === undefined) {
-    req.query.id = [];
-  } else {
-    req.query.id = req.query.id.split(',');
-  }
-
-  if (req.query.offset === undefined) {
-    req.query.offset = 0;
-  }
-
-  console.log(req.query)
-
-  cypher_db = "MATCH (o:codeRepo) \
-               MATCH (n:dataCat) \
-               WHERE  toLower(toString(n.id)) IN $id \
-               WITH n, o \
-               MATCH (n)<-[:Target]-(:ANNOTATION)-[:Target]->(o) \
-               RETURN toString(o.id), \
-                         o.name, \
-                         o.description, \
-                         o.url, \
-                         COLLECT(DISTINCT n.name) AS dbs \
-                  ORDER BY size(dbs) DESC \
-                  SKIP toInteger($offset) \
-                  LIMIT toInteger($limit)"
-
-  const session = driver.session();
-
-  /* First, try to find the database itself. */
-
-  const aa = session.readTransaction(tx => tx.run(cypher_db, {
-      id: req.query.id,
-      limit: parseInt(req.query.limit),
-      offset: parseInt(req.query.offset)
-    }))
+  const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
-      console.log(result.records)
-      const count = result.records.length;
+      output = parsedata(result.records).map(x=> {
+        var repo = x.ccdrs;
+        repo.count = x.count;
+        repo.keywords = x.keywords;
 
-      var db = '';
-
-      if (count === 0) {
-        res.status(200)
-          .json({
-            status: 'success',
-            data: {
-              count: 0,
-              database: null,
-              repos: null
-            },
-            message: 'No databases match the supplied search string: ' + req.query.search
-          })
-      } else {
-        console.log(result.records)
-
-        output = result.records.map(function(x) {
-          return {
-            id: x['_fields'][0],
-            name: x['_fields'][1],
-            description: x['_fields'][2],
-            url: x['_fields'][3],
-            dbs: x['_fields'][4],
-          }
+        if (Object.keys(repo).includes('meta')) {
+          repo.meta = JSON.parse(repo.meta)
+        };
+        return repo;
+      });
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            params: params,
+            data: output
+          },
+          message: 'Returning Throughput keywords.'
         })
-        res.status(200)
-          .json({
-            status: 'success',
-            data: {
-              ccdrs: output
-            },
-            message: 'Returned linked repositories.'
-          })
-      }
     })
     .catch(function(err) {
       console.error(err);
@@ -209,5 +78,4 @@ function ccdrLinks(req, res) {
     .finally(() => session.close())
 }
 
-module.exports.searchCcdrs = searchCcdrs;
-module.exports.ccdrLinks = ccdrLinks;
+module.exports.searchCCDR = searchCCDR;
