@@ -43,6 +43,12 @@ router.get('/api/keywords/repos', function(req, res) {
 })
 
 
+router.get('/api/ccdrs/repos', function(req, res) {
+  // Returns all keywords and counts of associated objects.
+  var query = require('./../helpers/repos/repoFromCcdr.js');
+  query.repoFromCcdr(req, res);
+})
+
 
 // Search endpoints associated with repositories:
 router.get('/api/repos', function(req, res) {
