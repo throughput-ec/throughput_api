@@ -14,6 +14,7 @@ function parsedata(records) {
     }
     return out;
   })
+
   return test;
 }
 
@@ -23,16 +24,13 @@ const driver = new neo4j.driver(pwbin.host,
     disableLosslessIntegers: true
   });
 
-function searchCCDR(req, res) {
+function keywordrepo(req, res) {
 
-  /* Return all keywords and a count of the nuber of annotations associated with each. */
-
-  const fullPath = path.join(__dirname, 'cql/searchCCDR.cql');
+  const fullPath = path.join(__dirname, 'cql/keywordRepoArray.cql');
   var textByLine = fs.readFileSync(fullPath).toString()
 
   params = {
     'keywords': [''],
-    'name': '',
     'offset': 0,
     'limit': 25
   }
@@ -44,7 +42,8 @@ function searchCCDR(req, res) {
       params[x] = params[x]
     }
   })
-  if (params.keywords !== ['']) {
+
+  if (!params.keywords === ['']) {
     params.keywords = params.keywords.split(',')
   }
 
@@ -52,16 +51,7 @@ function searchCCDR(req, res) {
 
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
-      output = parsedata(result.records).map(x=> {
-        var repo = x.ccdrs;
-        repo.count = x.count;
-        repo.keywords = x.keywords;
-
-        if (Object.keys(repo).includes('meta')) {
-          repo.meta = JSON.parse(repo.meta)
-        };
-        return repo;
-      });
+      output = parsedata(result.records)
       res.status(200)
         .json({
           status: 'success',
@@ -78,4 +68,4 @@ function searchCCDR(req, res) {
     .finally(() => session.close())
 }
 
-module.exports.searchCCDR = searchCCDR;
+module.exports.keywordrepo = keywordrepo;

@@ -104,7 +104,7 @@ function datanote(req, res) {
                   });
               } else {
                 // Everything works and we can do our work with the database:
-                const fullPath = path.join(__dirname, 'agent_post.cql');
+                const fullPath = path.join(__dirname, 'cql/agent_post.cql');
                 var textByLine = fs.readFileSync(fullPath).toString()
                 session.run(textByLine, input)
                   .then(result => {

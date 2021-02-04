@@ -1,119 +1,81 @@
 // Require Neo4j
+// Require Neo4j
 const neo4j = require('neo4j-driver');
+var fs = require('fs');
+const path = require('path');
 
 var pwbin = require('./../../pwbin.json')
 
+function parsedata(records) {
+  // Takes in the fields from neo4j and turns them into a named object
+  // Otherwise the keys and field values are split into different objects.
+  var test = records.map(x => {
+    var out = {}
+    for (i = 0; i < x.keys.length; i++) {
+      out[x.keys[i]] = x._fields[i];
+    }
+    return out;
+  })
+  return test;
+}
+
 // Create Driver
 const driver = new neo4j.driver(pwbin.host,
-  neo4j.auth.basic(pwbin.user, pwbin.password));
+  neo4j.auth.basic(pwbin.user, pwbin.password), {
+    disableLosslessIntegers: true
+  });
 
 function searchRepo(req, res) {
 
-  passedKeys = Object.keys(req.query);
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
 
-  if (req.query.search === undefined) {
-    req.query.search = "";
+  const fullPath = path.join(__dirname, 'cql/searchRepo.cql');
+  var textByLine = fs.readFileSync(fullPath).toString()
+
+  params = {
+    'keywords': [''],
+    'name': '',
+    'offset': 0,
+    'limit': 25
   }
 
-  if (req.query.keyword === undefined) {
-    req.query.keyword = "";
+  Object.keys(params).map(x => {
+    if (!!req.query[x]) {
+      params[x] = req.query[x]
+    } else {
+      params[x] = params[x]
+    }
+  })
+  if (!params.keywords === ['']) {
+    params.keywords = params.keywords.split(',')
   }
-
-  if (req.query.limit === undefined) {
-    req.query.limit = 15;
-  }
-
-  if (req.query.name === undefined) {
-    req.query.name = "";
-  }
-
-  if (req.query.offset === undefined) {
-    req.query.offset = 0;
-  }
-
-  cypher_db = "CALL db.index.fulltext.queryNodes('namesAndDescriptions', $search) \
-               YIELD node, score \
-               WHERE 'codeRepo' IN labels(node) \
-               WITH node \
-               OPTIONAL MATCH (node)<-[:Target]-(:ANNOTATION)-[:Target]->(o:dataCat) \
-               RETURN DISTINCT node.id as id, \
-                               node.name AS name, \
-                               node.description AS description, \
-                               node.url AS url, \
-                               toInteger(SIZE(COLLECT(o))) AS dbs \
-               SKIP toInteger($offset) \
-               LIMIT toInteger($limit)"
-
-  cypher_db_kw = "MATCH (k:KEYWORD)-[]-(:ANNOTATION)-[]-(n:codeRepo) \
-                  WHERE  \
-                  (toLower(k.keyword)) CONTAINS toLower($keyword) \
-                  WITH DISTINCT n \
-                  OPTIONAL MATCH (n)-[]-(:ANNOTATION)-[]-(o:dataCat) \
-                  RETURN DISTINCT n.id, \
-                         n.name AS name, \
-                         n.description AS description, \
-                         n.url AS url, \
-                         toInteger(SIZE(COLLECT(o))) AS dbs \
-                  ORDER BY dbs DESC \
-                  SKIP toInteger($offset) \
-                  LIMIT toInteger($limit)"
 
   const session = driver.session();
 
-  if (req.query.keywords == "") {
-    queryCall = cypher_db;
-  } else {
-    queryCall = cypher_db_kw;
-  }
-
-  const aa = session.readTransaction(tx => tx.run(queryCall, {
-      search: req.query.search,
-      name: req.query.name,
-      limit: parseInt(req.query.limit),
-      offset: parseInt(req.query.offset),
-      keyword: req.query.keyword
-    }))
+  const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
-      const count = result.records.length;
-      
-      var repo = '';
+      output = parsedata(result.records).map(x=> {
+        var repo = x.repos
+        if (Object.keys(repo).includes('meta')) {
+          repo.meta = JSON.parse(repo.meta)
+        };
+        return repo;
+      });
 
-      if (count === 0) {
-        res.status(200)
-          .json({
-            status: 'success',
-            data: {
-              count: 0,
-              repos: null,
-              database: null
-            },
-            message: 'No code repositories match the supplied search string: ' + req.query.search
-          })
-      } else {
-        output = result.records.map(function(x) {
-
-          return {
-            id: Math.max(x['_fields'][0]),
-            name: x['_fields'][1],
-            description: x['_fields'][2],
-            url: x['_fields'][3],
-            dbs: Math.max(x['_fields'][4])
-          }
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            params: params,
+            data: output
+          },
+          message: 'Returning Throughput keywords.'
         })
-        res.status(200)
-          .json({
-            status: 'success',
-            data: {
-              repositories: output
-            },
-            message: 'Returned linked repositories.'
-          })
-      }
     })
     .catch(function(err) {
       console.error(err);
     })
-    .finally(x => session.close())
+    .finally(() => session.close())
 }
 
 module.exports.searchRepo = searchRepo;
