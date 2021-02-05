@@ -66,8 +66,8 @@ function datanote(req, res) {
   input = {
     dbid: req.body.dbid,
     orcid: req.body.orcid,
-    level: req.body.level,
-    dataid: req.body.dataid,
+    additionalType: req.body.additionalType,
+    id: req.body.id,
     body: req.body.body,
     token: req.body.token
   }
