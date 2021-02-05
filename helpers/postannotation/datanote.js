@@ -18,8 +18,8 @@ function cleanStats(result) {
     .filter(x => stats[x] > 0)
     .reduce((obj, key) => {
       obj[key] = stats[key];
-    return obj;
-      }, {});
+      return obj;
+    }, {});
   return output;
 }
 
@@ -62,6 +62,8 @@ function checkdb(dbid) {
 }
 
 function datanote(req, res) {
+
+  console.log(req.body)
 
   input = {
     dbid: req.body.dbid,
@@ -108,22 +110,35 @@ function datanote(req, res) {
                 var textByLine = fs.readFileSync(fullPath).toString()
                 session.run(textByLine, input)
                   .then(result => {
-                    output = {'modifications': cleanStats(result),
-                              'parameters': input}
+                    output = {
+                      'modifications': cleanStats(result),
+                      'parameters': input
+                    }
                     res.status(200)
                       .json({
                         status: 'success',
                         data: output,
                         message: 'Posted note'
                       });
-                    session.close();
-                  });
+                  })
+                  .catch(function(err) {
+                    console.error(err)
+                  })
+                  .finally(() => session.close());
               }
             }
           });
       }
-    });
+    })
+    .catch(function(err) {
+      console.error(err);
+      res.status(500)
+        .json({
+          status: 'error',
+          data: err,
+          message: 'Failed to post note.'
+        });
+    })
 }
-
-module.exports.datanote = datanote;
-module.exports.checktoken = checktoken;
+  module.exports.datanote = datanote;
+  module.exports.checktoken = checktoken;
