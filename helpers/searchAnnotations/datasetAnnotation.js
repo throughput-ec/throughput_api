@@ -35,13 +35,24 @@ function databaseAnnotation(req, res) {
     'limit': 25
   }
 
-  Object.keys(params).map(x => {
-    if (!!req.query[x]) {
-      params[x] = req.query[x]
-    } else {
-      params[x] = params[x]
-    }
-  })
+  if(typeof req.body == 'undefined') {
+    Object.keys(params).map(x => {
+      if (!!req.query[x]) {
+        params[x] = req.query[x]
+      } else {
+        params[x] = params[x]
+      }
+    })
+  } else {
+    Object.keys(params).map(x => {
+      if (!!req.body[x]) {
+        params[x] = req.body[x]
+      } else {
+        params[x] = params[x]
+      }
+    })
+  }
+
 
   const session = driver.session();
 

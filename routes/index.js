@@ -123,4 +123,9 @@ router.get('/api/ccdrs/annotations', function(req, res) {
   dbanno.databaseAnnotation(req, res);
 })
 
+router.post('/api/ccdrs/annotations', function(req, res) {
+  var dbanno = require('./../helpers/searchAnnotations/datasetAnnotation.js');
+  dbanno.databaseAnnotation(req, res);
+})
+
 module.exports = router;
