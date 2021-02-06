@@ -119,10 +119,10 @@ function datanote(req, res) {
                         message: 'Posted note'
                       });
                   })
+                  .then(() => session.close());
                   .catch(function(err) {
                     console.error(err)
                   })
-                  .finally(() => session.close());
               }
             }
           });
