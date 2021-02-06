@@ -3,17 +3,19 @@
 UNWIND $keywords AS kws
   CALL apoc.when(kws <> "",
     "MATCH (k:KEYWORD)
-     WHERE k.keyword = $kws
+     WHERE toLower(k.keyword) = toLower($kws)
      RETURN DISTINCT k AS keywords",
     "MATCH (k:KEYWORD)
      RETURN DISTINCT k AS keywords",
     {kws:kws}) YIELD value
 WITH DISTINCT value.keywords AS keywords
 CALL apoc.when($name <> "",
-  "MATCH (o:codeRepo)
-   WHERE o.name CONTAINS($name)
-   MATCH (kws)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o)
-   RETURN DISTINCT o AS repo",
+  "MATCH (o:dataCat)
+   WHERE toLower(o.name) CONTAINS(toLower($name))
+   MATCH (o)<-[:Body]-(an:ANNOTATION)
+   MATCH (kws)<-[:hasKeyword]-(an)
+   OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(cr:codeRepo)
+   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT kws.keyword) AS keywords, COUNT(cr) AS count",
   "MATCH (kws)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o:dataCat)
    MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o)
    OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(cr:codeRepo)

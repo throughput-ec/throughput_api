@@ -16,7 +16,7 @@ MERGE (ags:AGENT { id:"http://throughputdb.com/",
                   homepage: "http://throughputdb.com"})
 ON CREATE SET ags.created = timestamp()
 MERGE (ags)<-[:isAgentType]-(ats)
-MERGE (ds:OBJECT {datasetid: $id, additionalType: $additionalType})
+MERGE (ds:OBJECT {id: $id, additionalType: $additionalType})
 MERGE (ds)-[:isType]->(dsty)
 MERGE (ds)<-[:Contains]-(db)
 WITH ds, ag, ags, tyb, mv

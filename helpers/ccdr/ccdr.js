@@ -44,18 +44,20 @@ function searchCCDR(req, res) {
       params[x] = params[x]
     }
   })
-  if (params.keywords !== ['']) {
+
+  if (params.keywords[0] !== '') {
     params.keywords = params.keywords.split(',')
   }
-
+  console.log(params)
   const session = driver.session();
 
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
+      console.log(result.records)
       output = parsedata(result.records).map(x=> {
-        var repo = x.ccdrs;
-        repo.count = x.count;
-        repo.keywords = x.keywords;
+        var ccrd = x.ccdrs;
+        ccdr.count = x.count;
+        ccdr.keywords = x.keywords;
 
         if (Object.keys(repo).includes('meta')) {
           repo.meta = JSON.parse(repo.meta)
@@ -69,13 +71,20 @@ function searchCCDR(req, res) {
             params: params,
             data: output
           },
-          message: 'Returning Throughput keywords.'
+          message: 'Returning Throughput databases.'
         })
     })
+    .then(() => session.close())
     .catch(function(err) {
-      console.error(err);
+      res.status(500)
+        .json({
+          status: 'failure',
+          data: {
+            params: params,
+            data: err
+          }
+        })
     })
-    .finally(() => session.close())
 }
 
 module.exports.searchCCDR = searchCCDR;

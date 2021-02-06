@@ -53,7 +53,6 @@ function databaseAnnotation(req, res) {
     })
   }
 
-
   const session = driver.session();
 
   const aa = session.readTransaction(tx => tx.run(textByLine, params))

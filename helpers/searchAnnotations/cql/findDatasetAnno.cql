@@ -15,7 +15,7 @@ WITH DISTINCT n, an, db, ob
 MATCH (an)-[:Created]->(agt:AGENT)
 RETURN DISTINCT db.id AS ccdr,
   'annotation' AS object,
-  'textualBody' AS type, 
+  'textualBody' AS type,
   agt.name AS annotationauthor,
   agt.id AS orcid,
   ob.id AS id,
