@@ -6,7 +6,8 @@ MATCH (agt:AGENTTYPE {type:"Person"})
 MATCH (db:dataCat {id: $dbid })
 MATCH (dsty:TYPE {type:'Dataset'})
 MATCH (tyb:TYPE {type:'TextualBody'})
-WITH ats, agt, db, dsty, tyb
+MATCH (mv:MOTIVATION {term:'describing'})
+WITH ats, agt, db, dsty, tyb, mv
 MERGE (ag:AGENT { id:$orcid })
 ON CREATE SET ag.created = timestamp()
 MERGE (ag)<-[:isAgentType]-(agt)
@@ -18,12 +19,13 @@ MERGE (ags)<-[:isAgentType]-(ats)
 MERGE (ds:OBJECT {datasetid: $id, additionalType: $additionalType})
 MERGE (ds)-[:isType]->(dsty)
 MERGE (ds)<-[:Contains]-(db)
-WITH ds, ag, ags, tyb
+WITH ds, ag, ags, tyb, mv
 CREATE (a:ANNOTATION {created: timestamp(), test: True})
 CREATE (a)-[:Target]->(ds)
 CREATE (a)-[:Generated]->(ags)
 CREATE (a)-[:Created]->(ag)
+CREATE (a)-[:hasMotivation]->(mv)
 WITH a, tyb
 CREATE (ob:OBJECT { value: $body, created: timestamp()})
-CREATE (ob)-[:Type]->(tyb)
+CREATE (ob)-[:isType]->(tyb)
 CREATE (ob)<-[:Body]-(a)

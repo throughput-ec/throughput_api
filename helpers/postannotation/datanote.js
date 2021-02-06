@@ -63,8 +63,6 @@ function checkdb(dbid) {
 
 function datanote(req, res) {
 
-  console.log(req.body)
-
   input = {
     dbid: req.body.dbid,
     orcid: req.body.orcid,

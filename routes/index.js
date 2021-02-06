@@ -68,12 +68,6 @@ router.post('/api/widget', function(req, res) {
   widget.datanote(req, res)
 })
 
-// Search endpoints associated with CCDRs:
-router.get('/api/ann', function(req, res) {
-  var widget = require('./../helpers/postannotation/datanote.js');
-  widget.datanote;
-})
-
 router.get('/api/ccdr/linked', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.ccdrLinks(req, res);
@@ -124,7 +118,7 @@ router.get('/api/citations', function(req, res) {
   cite.citations(req, res);
 })
 
-router.get('/api/db/annotations', function(req, res) {
+router.get('/api/ccdrs/annotations', function(req, res) {
   var dbanno = require('./../helpers/searchAnnotations/datasetAnnotation.js');
   dbanno.databaseAnnotation(req, res);
 })

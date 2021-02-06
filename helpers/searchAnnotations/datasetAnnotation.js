@@ -1,18 +1,20 @@
 const neo4j = require('neo4j-driver');
+var fs = require('fs');
+const path = require('path');
 
 var pwbin = require('./../../pwbin.json')
 
 function parsedata(records) {
-  result = []
-  for (var i = 0; i < Object.keys(records['records']).length; i++) {
-    annotation = {}
-    loopElem = records['records'][i]
-    for (var j = 0; j < loopElem['length']; j++){
-      annotation[loopElem['keys'][j]] = loopElem['_fields'][j];
+  // Takes in the fields from neo4j and turns them into a named object
+  // Otherwise the keys and field values are split into different objects.
+  var test = records.map(x => {
+    var out = {}
+    for (i = 0; i < x.keys.length; i++) {
+      out[x.keys[i]] = x._fields[i];
     }
-    result.push(annotation)
-  }
-  return result;
+    return out;
+  })
+  return test;
 }
 
 // Create Driver
@@ -20,44 +22,49 @@ const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.p
 
 function databaseAnnotation(req, res) {
 
-  if (typeof req.query.level === 'undefined')   { req.query.level = '' }
-  if (typeof req.query.link === 'undefined')    { req.query.link = '' }
+  /* Return all keywords and a count of the nuber of annotations associated with each. */
 
-  cypher = "MATCH (n:OBJECT)<-[:Body]-(an:ANNOTATION)-[:Target]->(db:OBJECT) \
-            WHERE db.id = $id AND \
-            (an)-[:hasMotivation]->(:MOTIVATION {term:'describing'}) AND \
-            (n)-[:isType]->(:TYPE {type:'TextualBody'}) \
-            AND ($link = '' OR n.linkid = $link) \
-            AND ($level = '' OR n.level = $level) \
-            WITH DISTINCT n, an, db \
-              MATCH (an)-[:Created]->(agt:AGENT) \
-            RETURN DISTINCT db.id AS database, \
-                   'annotation' AS element, \
-                       agt.name AS author, \
-                         agt.id AS orcid, \
-                       n.linkid AS link, \
-                        n.level AS level, \
-                        n.value AS annotation, \
-                      apoc.date.toISO8601(n.created) AS date"
+  const fullPath = path.join(__dirname, 'cql/findDatasetAnno.cql');
+  var textByLine = fs.readFileSync(fullPath).toString()
+
+  params = {
+    'dbid': '',
+    'additionalType': '',
+    'id': '',
+    'offset': 0,
+    'limit': 25
+  }
+
+  Object.keys(params).map(x => {
+    if (!!req.query[x]) {
+      params[x] = req.query[x]
+    } else {
+      params[x] = params[x]
+    }
+  })
 
   const session = driver.session();
 
-  session.run(cypher, {
-      id: req.query.id,
-      link: req.query.link,
-      level: req.query.level
-    })
+  const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
-      output = parsedata(result);
+      output = parsedata(result.records);
       res.status(200)
         .json({
           status: 'success',
           data: output,
+          message: 'Returning data annotations.'
+        })
+    })
+    .then(() => session.close())
+    .catch(function(err) {
+      console.log(err)
+      res.status(500)
+        .json({
+          status: 'failure',
+          data: err,
           message: 'Searched for stuff.'
-        });
-      session.close();
-    });
-
+        })
+    })
 }
 
 module.exports.databaseAnnotation = databaseAnnotation;
