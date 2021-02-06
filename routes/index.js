@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-var bodyParser  =  require("body-parser");
-router.use(bodyParser.urlencoded({ extended: false }));
+var bodyParser = require("body-parser");
+router.use(bodyParser.urlencoded({
+  extended: false
+}));
 
 var jsonParser = bodyParser.json()
 
@@ -42,7 +44,6 @@ router.get('/api/keywords/repos', function(req, res) {
   query.searchRepo(req, res);
 })
 
-
 router.get('/api/ccdrs/repos', function(req, res) {
   // Returns all keywords and counts of associated objects.
   var query = require('./../helpers/repos/repoFromCcdr.js');
@@ -59,11 +60,10 @@ router.get('/api/repos', function(req, res) {
 // Search endpoints associated with CCDRs:
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
-  ccdr.searchCcdrs(req, res);
+  ccdr.searchCCDR(req, res);
 })
 
 router.post('/api/widget', function(req, res) {
-  console.log('yes!')
   var widget = require('./../helpers/postannotation/datanote.js')
   widget.datanote(req, res)
 })
