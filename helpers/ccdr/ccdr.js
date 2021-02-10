@@ -14,6 +14,7 @@ function parsedata(records) {
     }
     return out;
   })
+
   return test;
 }
 
@@ -48,34 +49,33 @@ function searchCCDR(req, res) {
   if (params.keywords[0] !== '') {
     params.keywords = params.keywords.split(',')
   }
-  console.log(params)
+
   const session = driver.session();
 
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
-      console.log(result.records)
-      output = parsedata(result.records).map(x=> {
-        var ccrd = x.ccdrs;
-        ccdr.count = x.count;
-        ccdr.keywords = x.keywords;
 
-        if (Object.keys(repo).includes('meta')) {
-          repo.meta = JSON.parse(repo.meta)
-        };
-        return repo;
+      output = parsedata(result.records).map(function(x) {
+        var ccdr =  x['ccdrs'];
+        ccdr['count'] = x['count'];
+        ccdr['keywords'] = x['keywords'];
+
+        return ccdr;
       });
+
       res.status(200)
-        .json({
-          status: 'success',
-          data: {
-            params: params,
-            data: output
-          },
-          message: 'Returning Throughput databases.'
-        })
+          .json({
+            status: 'success',
+            data: {
+              params: params,
+              data: output
+            },
+            message: 'Returning Throughput databases.'
+          })
     })
     .then(() => session.close())
     .catch(function(err) {
+      console.log(err)
       res.status(500)
         .json({
           status: 'failure',
