@@ -34,6 +34,7 @@ function searchCCDR(req, res) {
   params = {
     'keywords': [''],
     'name': '',
+    'search': '',
     'offset': 0,
     'limit': 25
   }
@@ -48,6 +49,10 @@ function searchCCDR(req, res) {
 
   if (params.keywords[0] !== '') {
     params.keywords = params.keywords.split(',')
+  }
+
+  if (params.search !== '') {
+    params.name = params.search;
   }
 
   const session = driver.session();
