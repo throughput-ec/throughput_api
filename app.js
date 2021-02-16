@@ -81,7 +81,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.all('*', function(req, res) {
+app.all('*', function(req, res, next) {
   res.redirect('/api-docs');
 });
 

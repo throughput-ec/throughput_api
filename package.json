@@ -41,6 +41,11 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "mocha": "^6.2.2"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^26.6.3",
+    "mocha": "^6.2.2",
+    "superagent": "^6.1.0",
+    "supertest": "^6.1.3"
   }
 }

@@ -35,7 +35,8 @@ function databaseAnnotation(req, res) {
     'limit': 25
   }
 
-  if(typeof req.body == 'undefined') {
+  if(typeof req.body.length == 'undefined') {
+    // Check to see if there is a body element.
     Object.keys(params).map(x => {
       if (!!req.query[x]) {
         params[x] = req.query[x]
@@ -52,7 +53,7 @@ function databaseAnnotation(req, res) {
       }
     })
   }
-
+  console.log(params)
   const session = driver.session();
 
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
