@@ -16,7 +16,9 @@ UNWIND $keywords AS kws
 WITH DISTINCT value.keywords AS keywords
 MATCH (keywords)<-[:hasKeyword]-(n:ANNOTATION)-[:Body]-(o:dataCat)
 OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(n:codeRepo)
-WITH DISTINCT properties(o) AS database, COLLECT(DISTINCT keywords.keyword) AS keywords, SIZE(COLLECT(n)) AS repos
+WITH DISTINCT properties(o) AS database,
+     COLLECT(DISTINCT keywords.keyword) AS keywords,
+     SIZE(COLLECT(n)) AS repos
 RETURN database.name AS name,
        database.description AS description,
        database.id AS id,
