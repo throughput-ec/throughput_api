@@ -117,12 +117,14 @@ function datanote(req, res) {
                         status: 'success',
                         data: output,
                         message: 'Posted note'
-                      });
+                      })
+                    .then(() => {
+                      session.close()
+                    })
                   })
                   .catch(function(err) {
                     console.error(err)
                   })
-                  .finally(() => session.close())
               }
             }
           });
