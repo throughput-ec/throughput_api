@@ -60,7 +60,7 @@ function databaseAnnotation(req, res) {
   }
 
   const session = driver.session();
-
+console.log(params)
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
       output = parsedata(result.records);

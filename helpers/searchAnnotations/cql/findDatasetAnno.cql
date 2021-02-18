@@ -6,7 +6,7 @@ WITH tyd, tyb, db
 MATCH (db)-[:Contains]->(ob:OBJECT)
   WHERE (ob)-[:isType]->(tyd)
     AND ($additionalType = '' OR ob.additionalType = $additionalType)
-    AND ($id = '' OR ob.id = $id)
+    AND ($id = '' OR toString(ob.id) = $id OR ob.id = toInteger($id))
 WITH ob, db, tyb
 MATCH (ob)<-[:Target]-(an:ANNOTATION)
 MATCH (an)-[:Body]->(n:OBJECT)
