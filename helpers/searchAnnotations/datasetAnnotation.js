@@ -29,6 +29,7 @@ function databaseAnnotation(req, res) {
 
   params = {
     'dbid': '',
+    'ccdr': '',
     'additionalType': '',
     'id': '',
     'offset': 0,
@@ -53,7 +54,11 @@ function databaseAnnotation(req, res) {
       }
     })
   }
-  console.log(params)
+
+  if (params.dbid === '' & params.ccdr !== '') {
+    params.dbid = params.ccdr;
+  }
+
   const session = driver.session();
 
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
