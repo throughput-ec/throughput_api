@@ -26,6 +26,11 @@ function cleanStats(result) {
 function checktoken(token) {
 
   console.log('Checking token ' + token)
+
+  if (token === undefined) {
+    token = ""
+  }
+
   output = session.run('MATCH (tk:TOKEN) WHERE tk.token = $token RETURN COUNT(tk) AS count', {
       'token': token
     })
@@ -45,6 +50,10 @@ function checktoken(token) {
 function checkdb(dbid) {
 
   console.log('Checking dbid ' + dbid)
+  if (dbid === undefined) {
+    dbid = ""
+  }
+
   output = session.run('MATCH (dc:dataCat) WHERE dc.id = $dbid RETURN COUNT(dc) AS count', {
       'dbid': dbid
     })
@@ -87,7 +96,7 @@ function datanote(req, res) {
         // Person is valid if an ORCID regex resolves.
         checkdb(input.dbid)
           .then(result => {
-            if (result == 0) {
+            if (result === 0) {
               res.status(500)
                 .json({
                   status: 'error',
