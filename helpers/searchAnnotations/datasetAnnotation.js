@@ -36,7 +36,7 @@ function databaseAnnotation(req, res) {
     'limit': 25
   }
 
-  if(typeof req.body.length == 'undefined') {
+  if(Object.keys(req.route.methods).includes('get')) {
     // Check to see if there is a body element.
     Object.keys(params).map(x => {
       if (!!req.query[x]) {
