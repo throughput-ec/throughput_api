@@ -26,7 +26,7 @@ const driver = new neo4j.driver(pwbin.host,
   });
 
 function allkeywords(req, res) {
-  /* Return all keywords and a count of the nuber of annotations associated with each. */
+  /* Return all repositories and databases associated with particular keywords. */
 
   const fullPath = path.join(__dirname, 'cql/keywordArray.cql');
   var textByLine = fs.readFileSync(fullPath).toString()

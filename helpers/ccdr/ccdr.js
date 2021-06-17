@@ -24,6 +24,62 @@ const driver = new neo4j.driver(pwbin.host,
     disableLosslessIntegers: true
   });
 
+
+function dbNameOnly(req, res) {
+  query = "MATCH (o:dataCat) WHERE\
+            tolower(o.name) =~ tolower($name) \
+            RETURN COLLECT(o.name) AS names"
+
+  params = {
+    'name': '',
+    'offset': 0,
+    'limit': 25
+  }
+
+  Object.keys(params).map(x => {
+    if (!!req.query[x]) {
+      params[x] = req.query[x]
+    } else {
+      params[x] = params[x]
+
+    }
+  })
+  if (!params.name === ['']) {
+    res.status(200)
+      .json({
+        status: 'success',
+        data: {
+          params: params,
+          data: []
+        },
+        message: 'Empty result set.'
+      })
+  } else {
+    params.name = params.name + '.*'
+
+    const session = driver.session();
+
+    const aa = session.readTransaction(tx => tx.run(query, params))
+      .then(result => {
+        output = parsedata(result.records)[0]
+
+        res.status(200)
+          .json({
+            status: 'success',
+            data: {
+              params: params,
+              data: output
+            },
+            message: 'Returning Throughput keywords.'
+          })
+      })
+      .catch(function (err) {
+        console.error(err);
+      })
+      .finally(() => session.close())
+  }
+}
+
 function searchCCDR(req, res) {
 
   /* Return all keywords and a count of the nuber of annotations associated with each. */
@@ -60,8 +116,8 @@ function searchCCDR(req, res) {
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
 
-      output = parsedata(result.records).map(function(x) {
-        var ccdr =  x['ccdrs'];
+      output = parsedata(result.records).map(function (x) {
+        var ccdr = x['ccdrs'];
         ccdr['count'] = x['count'];
         ccdr['keywords'] = x['keywords'];
 
@@ -69,17 +125,17 @@ function searchCCDR(req, res) {
       });
 
       res.status(200)
-          .json({
-            status: 'success',
-            data: {
-              params: params,
-              data: output
-            },
-            message: 'Returning Throughput databases.'
-          })
+        .json({
+          status: 'success',
+          data: {
+            params: params,
+            data: output
+          },
+          message: 'Returning Throughput databases.'
+        })
     })
     .then(() => session.close())
-    .catch(function(err) {
+    .catch(function (err) {
       console.log(err)
       res.status(500)
         .json({
@@ -93,3 +149,4 @@ function searchCCDR(req, res) {
 }
 
 module.exports.searchCCDR = searchCCDR;
+module.exports.dbNameOnly = dbNameOnly;

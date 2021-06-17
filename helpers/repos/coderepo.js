@@ -25,6 +25,61 @@ const driver = new neo4j.driver(pwbin.host,
     disableLosslessIntegers: true
   });
 
+function nameonly(req, res) {
+  query = "MATCH (o:codeRepo) WHERE\
+            tolower(o.name) =~ tolower($name) \
+            RETURN COLLECT(o.name) AS names"
+
+  params = {
+    'name': '',
+    'offset': 0,
+    'limit': 25
+  }
+
+  Object.keys(params).map(x => {
+    if (!!req.query[x]) {
+      params[x] = req.query[x]
+    } else {
+      params[x] = params[x]
+
+    }
+  })
+  if (!params.name === ['']) {
+    res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            params: params,
+            data: []
+          },
+          message: 'Empty result set.'
+        })
+  } else {
+    params.name = params.name + '.*'
+
+  const session = driver.session();
+
+  const aa = session.readTransaction(tx => tx.run(query, params))
+    .then(result => {
+      output = parsedata(result.records)[0]
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            params: params,
+            data: output
+          },
+          message: 'Returning Throughput keywords.'
+        })
+    })
+    .catch(function(err) {
+      console.error(err);
+    })
+    .finally(() => session.close())
+  }
+}
+
 function searchRepo(req, res) {
 
   /* Return all keywords and a count of the nuber of annotations associated with each. */
@@ -79,3 +134,4 @@ function searchRepo(req, res) {
 }
 
 module.exports.searchRepo = searchRepo;
+module.exports.nameonly = nameonly;
