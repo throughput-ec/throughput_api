@@ -38,17 +38,17 @@ paths:
                   $ref:       '#/components/schemas/annos'
         '400':
           description:        bad input parameter
-  /keyword:
+  /keywords:
     get:
       tags:
       - keywords
-      summary:                searches for keywords related to databases and code repositories
+      summary:                Returns a list of all keywords in Throughput.
       operationId:            searchRepo
       description:            Looks for a keyword and then finds all related keywords associated with databases and code repositories.
       parameters:
         - in:                 query
           name:               keyword
-          description:        Pass a keyword, or partial keyword.
+          description:        Pass a keyword, partial keyword or comma separated string of keywords.
           required:           false
           schema:
             type:             string
@@ -69,34 +69,6 @@ paths:
             format:           int32
             minimum:          0
             default: 0
-      responses:
-        '200':
-          description:        keywords matching the search criteria.
-          content:
-            application/json:
-              schema:
-                type:         array
-                items:
-                  $ref:       '#/components/schemas/keyword'
-        '400':
-          description:        bad input parameter
-  /keyword/repos:
-    get:
-      tags:
-      - keyword
-      - repository
-      - database
-      summary: Get all available keywords assigned to a code repository or set of code repositories using comma separated ID values.
-      operationId: crKey
-      description: Given a particular identifier for code repositories, search for the code repository in Throughput and return all associated keywords.
-      parameters:
-        - in:                 path
-          name:               repoid
-          description:        A unique GitHub repository identifier.
-          required:           true
-          schema:
-            type:             string
-            example:  52386946
       responses:
         '200':
           description:        keywords matching the search criteria.

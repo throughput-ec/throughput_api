@@ -1,6 +1,8 @@
 const neo4j = require('neo4j-driver');
-var fs = require('fs');
+const fs = require('fs');
 const path = require('path');
+const jwt = require('jsonwebtoken');
+const fetch = require('node-fetch');
 
 var pwbin = require('./../../pwbin.json')
 
@@ -54,6 +56,11 @@ function databaseAnnotation(req, res) {
       }
     })
   }
+
+  var tokenstuff = fetch('https://orcid.org/oauth/jwks')
+    .then(res => res.text())
+    .then(secret => checktoken(params.token, JSON.parse(secret))['keys'])
+    .then(output => { return(output)});
 
   if (params.dbid === '' & params.ccdr !== '') {
     params.dbid = params.ccdr;

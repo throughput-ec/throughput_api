@@ -2,11 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 var bodyParser = require("body-parser");
-router.use(bodyParser.urlencoded({
-  extended: false
-}));
-
-var jsonParser = bodyParser.json()
 
 // KEYWORDS
 // Keywords from keyword searches, or all keywords (with counts)
@@ -27,6 +22,13 @@ router.get('/api/ccdrs/keywords', function(req, res) {
 router.get('/api/repos/keywords', function(req, res) {
   var ccdr = require('./../helpers/keywords/keywordrepo.js');
   ccdr.keywordrepo(req, res);
+})
+
+// SUBJECTS
+// Get subjects associated with specific data repositories
+router.get('/api/ccdrs/subjects', function(req, res) {
+  var ccdr = require('./../helpers/subjects/subjectccdr.js');
+  ccdr.subjectccdr(req, res);
 })
 
 // DATABASES
@@ -57,10 +59,21 @@ router.get('/api/repos', function(req, res) {
   ccdr.searchRepo(req, res);
 })
 
+// Search endpoints associated with repositories:
+router.get('/api/repos/name', function(req, res) {
+  var ccdr = require('./../helpers/repos/coderepo.js');
+  ccdr.nameonly(req, res);
+})
+
 // Search endpoints associated with CCDRs:
 router.get('/api/ccdr', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.searchCCDR(req, res);
+})
+
+router.get('/api/ccdr/name', function(req, res) {
+  var ccdr = require('./../helpers/ccdr/ccdr.js');
+  ccdr.dbNameOnly(req, res);
 })
 
 router.post('/api/widget', function(req, res) {
@@ -126,6 +139,11 @@ router.get('/api/ccdrs/annotations', function(req, res) {
 router.post('/api/ccdrs/annotations', function(req, res) {
   var dbanno = require('./../helpers/searchAnnotations/datasetAnnotation.js');
   dbanno.databaseAnnotation(req, res);
+})
+
+router.get('/api/throughputvue', function(req, res) {
+  var postGithub = require('./../helpers/addRepo/addRepo.js');
+  postGithub.linkRepo(req, res);
 })
 
 module.exports = router;

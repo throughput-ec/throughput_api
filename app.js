@@ -1,21 +1,24 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
-var cors = require('cors');
+let express = require('express');
+let apicache = require('apicache');
+let path = require('path');
+let favicon = require('serve-favicon');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
+let bodyParser = require('body-parser');
+let cors = require('cors');
 const YAML = require('yamljs');
-var fs = require('fs');
-var swaggerUi = require('swagger-ui-express'),
+let fs = require('fs');
+let swaggerUi = require('swagger-ui-express'),
   swaggerDocument = YAML.load('./throughput.yaml');
 
-var app = express();
+let app = express();
+let cache = apicache.middleware;
 
 app.use(cors({credentials: true, origin: true}))
+app.use(cache('15 minutes'));
 
 // create a write stream (in append mode)
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
+let accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
   flags: 'a'
 })
 
@@ -27,12 +30,12 @@ app.use(logger(':date[iso]\t:remote-addr\t:method\t:url\t:status\t:res[content-l
 // 3. (optionally) Serve the OpenAPI spec
 const spec = path.join(__dirname, 'throughput.yaml');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+let routes = require('./routes/index');
+let users = require('./routes/users');
 
-var debug = require('debug')('app4')
+let debug = require('debug')('app4')
 
-var options = {
+let options = {
   swaggerUrl: 'https://throughputdb.com/api-docs',
   customCssUrl: '/custom.css'
 }
@@ -49,9 +52,6 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded({
   extended: false
 }));
-
-app.use(bodyParser.json());
-app.use(bodyParser.raw());
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));

@@ -2,6 +2,7 @@ const expect    = require("chai").expect;
 const fetch = require("node-fetch");
 
 describe("repo_lister.vue and lister.vue calls:", function() {
+  this.timeout(5000);
   it("Returns a `citation` of length 1 when one Database ID is passed:", async () => {
     let cite = await fetch('http://localhost:3000/api/citations?ids=r3d100010313', {method:'GET'});
     let response =  await cite.json();
