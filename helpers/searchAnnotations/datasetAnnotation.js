@@ -24,7 +24,7 @@ const driver = new neo4j.driver(pwbin.host, neo4j.auth.basic(pwbin.user, pwbin.p
 
 function databaseAnnotation(req, res) {
 
-  /* Return all keywords and a count of the nuber of annotations associated with each. */
+  /* Return all keywords and a count of the number of annotations associated with each. */
 
   const fullPath = path.join(__dirname, 'cql/findDatasetAnno.cql');
   var textByLine = fs.readFileSync(fullPath).toString()
@@ -38,36 +38,20 @@ function databaseAnnotation(req, res) {
     'limit': 25
   }
 
-  if(Object.keys(req.route.methods).includes('get')) {
-    // Check to see if there is a body element.
-    Object.keys(params).map(x => {
-      if (!!req.query[x]) {
-        params[x] = req.query[x]
-      } else {
-        params[x] = params[x]
-      }
-    })
-  } else {
-    Object.keys(params).map(x => {
-      if (!!req.body[x]) {
-        params[x] = req.body[x]
-      } else {
-        params[x] = params[x]
-      }
-    })
-  }
-
-  var tokenstuff = fetch('https://orcid.org/oauth/jwks')
-    .then(res => res.text())
-    .then(secret => checktoken(params.token, JSON.parse(secret))['keys'])
-    .then(output => { return(output)});
+  Object.keys(params).map(x => {
+    if (!!req.query[x]) {
+      params[x] = req.query[x]
+    } else {
+      params[x] = params[x]
+    }
+  })
 
   if (params.dbid === '' & params.ccdr !== '') {
     params.dbid = params.ccdr;
   }
 
   const session = driver.session();
-console.log(params)
+
   const aa = session.readTransaction(tx => tx.run(textByLine, params))
     .then(result => {
       output = parsedata(result.records);
