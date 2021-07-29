@@ -1,8 +1,17 @@
+// This is the module to manage the cookie:
+// The user will send a valid ORCID cookie
+// We will validate the cookie
+// We will send back a jwt token using our secret key in our .env file with the ORCID ID.
+// It will expire in 1 week.
+
 // Require Neo4j
 const neo4j = require('neo4j-driver');
 var fs = require('fs');
 const path = require('path');
 var jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+
+dotenv.config()
 
 var pwbin = require('./../../pwbin.json')
 
@@ -24,18 +33,36 @@ function cleanStats(result) {
   return output;
 }
 
-function checktoken(token) {
+function checktptoken(req, res) {
 
-  console.log('Checking token ' + token)
+  const authHeader = req.headers['authorization'].split(' ');
 
-  if (token === undefined) {
-    token = ""
+  const verified = jwt.verify(token=authHeader[1], 
+    secretOrPublicKey=process.env.TOKEN_SECRET,
+    function(err, decoded) {
+      if (err) {
+        var dummy = 1;
+      }
+    })
+
+  if (verified === undefined) {
+    res.status(401)
+        .json({
+          status: 'error',
+          data: null,
+          message: 'You must provide a valid token as a Bearer token in the call header.'
+        });
+  } else {
+    res.status(200)
+          .json({
+            status: 'success',
+            data: verified['orcid'],
+            message: 'The token works.'
+          });
   }
-  const output = jwt.verify(token)
-    .then(data => console.log(data))
 
-  return output;
 }
+
 
 function checkdb(dbid) {
 
@@ -93,5 +120,6 @@ function datanote(req, res) {
         });
     })
 }
-  module.exports.datanote = datanote;
-  module.exports.checktoken = checktoken;
+
+module.exports.datanote = datanote;
+module.exports.checktptoken = checktptoken;
