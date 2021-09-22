@@ -15,11 +15,11 @@ CALL apoc.when($name <> "",
    MATCH (o)<-[:Body]-(an:ANNOTATION)
    MATCH (kws)<-[:hasKeyword]-(an)
    OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(cr:codeRepo)
-   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT kws.keyword) AS keywords, COUNT(cr) AS count",
+   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT kws.keyword) AS keywords, COUNT(DISTINCT cr) AS count",
   "MATCH (kws)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o:dataCat)
    MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o)
    OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(cr:codeRepo)
-   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT k.keyword) AS keywords, COUNT(cr) AS count",
+   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT k.keyword) AS keywords, COUNT(DISTINCT cr) AS count",
    {name:$name, kws:keywords}) YIELD value AS values
 WITH values.ccdr AS ccdr, values.keywords AS keywords, values.count AS count
 RETURN DISTINCT properties(ccdr) AS ccdrs, [x IN keywords WHERE x IN $keywords] AS keywords, count
