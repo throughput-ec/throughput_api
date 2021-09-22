@@ -1,0 +1,830 @@
+{
+  "stats": {
+    "suites": 16,
+    "tests": 21,
+    "passes": 14,
+    "pending": 0,
+    "failures": 7,
+    "start": "2021-09-22T16:12:18.272Z",
+    "end": "2021-09-22T16:12:27.369Z",
+    "duration": 9097,
+    "testsRegistered": 21,
+    "passPercent": 66.66666666666666,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "578074f3-3be2-4307-8377-15dec23d5546",
+      "title": "",
+      "fullFile": "",
+      "file": "",
+      "beforeHooks": [],
+      "afterHooks": [
+        {
+          "title": "\"after each\" hook",
+          "fullTitle": "\"after each\" hook",
+          "timedOut": false,
+          "duration": 0,
+          "state": null,
+          "speed": null,
+          "pass": false,
+          "fail": false,
+          "pending": false,
+          "context": null,
+          "code": "checkForUnfulfilledExpectations.call(this);\nrecordedExpects = [];",
+          "err": {},
+          "uuid": "1c432824-3da1-4479-a04b-f6c9bf0f50a4",
+          "parentUUID": "578074f3-3be2-4307-8377-15dec23d5546",
+          "isHook": true,
+          "skipped": false
+        }
+      ],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "213770b8-0080-40bb-a9cf-cc0a1c41915f",
+          "title": "tests for /ccdr",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/ccdr-test.js",
+          "file": "/test/ccdr-test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "cabdf534-ec9d-4150-a529-8b04a6ee6ac2",
+              "title": "tests for get",
+              "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/ccdr-test.js",
+              "file": "/test/ccdr-test.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [
+                {
+                  "title": "should respond 200 for \"search results matching criteria\"",
+                  "fullTitle": "tests for /ccdr tests for get should respond 200 for \"search results matching criteria\"",
+                  "timedOut": false,
+                  "duration": 115,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/ccdr', { \n    'qs': {\"name\":\"pariatur veniam proident\",\"search\":\"laboris culpa eu deserunt incididunt\",\"keyword\":\"et\",\"limit\":3,\"offset\":60727122},\n    'time': true\n});\nexpect(response).to.have.status(200);\nreturn chakram.wait();",
+                  "err": {},
+                  "uuid": "a1ecdfed-030b-4895-abfe-cae99aadcb5f",
+                  "parentUUID": "cabdf534-ec9d-4150-a529-8b04a6ee6ac2",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should respond 400 for \"bad input parameter\"",
+                  "fullTitle": "tests for /ccdr tests for get should respond 400 for \"bad input parameter\"",
+                  "timedOut": false,
+                  "duration": 17,
+                  "state": "failed",
+                  "speed": null,
+                  "pass": false,
+                  "fail": true,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/ccdr', { \n    'qs': {\"name\":\"ex magna\",\"search\":\"cupidatat aute dolor proident\",\"keyword\":\"in dolore sunt consectetur\",\"limit\":39,\"offset\":45685440},\n    'time': true\n});\nexpect(response).to.have.status(400);\nreturn chakram.wait();",
+                  "err": {
+                    "message": "AssertionError: expected status code 200 to equal 400",
+                    "estack": "AssertionError: expected status code 200 to equal 400",
+                    "diff": null
+                  },
+                  "uuid": "9d8740bd-4c80-4cfa-8973-efb78263cf7e",
+                  "parentUUID": "cabdf534-ec9d-4150-a529-8b04a6ee6ac2",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "a1ecdfed-030b-4895-abfe-cae99aadcb5f"
+              ],
+              "failures": [
+                "9d8740bd-4c80-4cfa-8973-efb78263cf7e"
+              ],
+              "pending": [],
+              "skipped": [],
+              "duration": 132,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 30000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 30000
+        },
+        {
+          "uuid": "1f88c938-bf76-45d7-acf0-956815ac75de",
+          "title": "repo_lister.vue and lister.vue calls:",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/cookbook.js",
+          "file": "/test/cookbook.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Returns a `citation` of length 1 when one Database ID is passed:",
+              "fullTitle": "repo_lister.vue and lister.vue calls: Returns a `citation` of length 1 when one Database ID is passed:",
+              "timedOut": false,
+              "duration": 1316,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "let cite = await fetch('http://localhost:3000/api/citations?ids=r3d100010313', {method:'GET'});\nlet response =  await cite.json();\nexpect(response.data).to.contain.all.keys('citation');\nexpect(response.data.citation).to.have.lengthOf(1);",
+              "err": {},
+              "uuid": "3ac49546-d829-431e-832c-70327005280a",
+              "parentUUID": "1f88c938-bf76-45d7-acf0-956815ac75de",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Returns a `citation` of length n when a list of database IDs are passed:",
+              "fullTitle": "repo_lister.vue and lister.vue calls: Returns a `citation` of length n when a list of database IDs are passed:",
+              "timedOut": false,
+              "duration": 572,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "let cite = await fetch('http://localhost:3000/api/citations?ids=r3d100010313,r3d100010316,r3d100012277', {method:'GET'});\nlet response =  await cite.json();\nexpect(response.data).to.contain.all.keys('citation');\nexpect(response.data.citation).to.have.lengthOf(3);",
+              "err": {},
+              "uuid": "7fd40e88-165b-439a-bc48-c6c449ef9bb1",
+              "parentUUID": "1f88c938-bf76-45d7-acf0-956815ac75de",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Returns a `citation` of length 1 when a repo ID is passed:",
+              "fullTitle": "repo_lister.vue and lister.vue calls: Returns a `citation` of length 1 when a repo ID is passed:",
+              "timedOut": false,
+              "duration": 540,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "let cite = await fetch('http://localhost:3000/api/citations?ids=80521204,52386946,56258788', {method:'GET'});\nlet response =  await cite.json();\nexpect(response.data).to.contain.all.keys('citation');\nexpect(response.data.citation).to.have.lengthOf(3);",
+              "err": {},
+              "uuid": "3c85ffe4-4b64-4ca5-9a10-a0264a0d5292",
+              "parentUUID": "1f88c938-bf76-45d7-acf0-956815ac75de",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "3ac49546-d829-431e-832c-70327005280a",
+            "7fd40e88-165b-439a-bc48-c6c449ef9bb1",
+            "3c85ffe4-4b64-4ca5-9a10-a0264a0d5292"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 2428,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 5000
+        },
+        {
+          "uuid": "40f48b56-87ba-4ef9-a7f0-43d8a1c5ad98",
+          "title": "keyword_search.vue calls:",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/cookbook.js",
+          "file": "/test/cookbook.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Returns a list of all keywords associated with data catalogs:",
+              "fullTitle": "keyword_search.vue calls: Returns a list of all keywords associated with data catalogs:",
+              "timedOut": false,
+              "duration": 1674,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "let cite = await fetch('http://localhost:3000/api/ccdrs/keywords?limit=99999', {method:'GET'});\nlet response =  await cite.json();\nexpect(response.data).to.contain.all.keys('data');\nexpect(response.data.data).to.have.lengthOf.at.least(1);\nexpect(response.data.data[0]).to.contain.all.keys('keywords', 'count');",
+              "err": {},
+              "uuid": "9e77c717-b74a-404a-bd81-2a7d29008629",
+              "parentUUID": "40f48b56-87ba-4ef9-a7f0-43d8a1c5ad98",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Returns a data catalog when searched by name:",
+              "fullTitle": "keyword_search.vue calls: Returns a data catalog when searched by name:",
+              "timedOut": false,
+              "duration": 3557,
+              "state": "passed",
+              "speed": "slow",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "let cite = await fetch('http://localhost:3000/api/ccdr?name=Neotoma', {method:'GET'});\nlet response =  await cite.json();\nexpect(response.data).to.contain.all.keys('data');\nexpect(response.data.data).to.have.lengthOf.at.least(1);\nexpect(response.data.data[0]).to.contain.all.keys('created', 'contact', 'name', 'description', 'id', 'url', 'count', 'keywords');",
+              "err": {},
+              "uuid": "8ae0cbb2-f2b9-411f-8eec-7f82c4c235c1",
+              "parentUUID": "40f48b56-87ba-4ef9-a7f0-43d8a1c5ad98",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Returns code repositories associated with a database:",
+              "fullTitle": "keyword_search.vue calls: Returns code repositories associated with a database:",
+              "timedOut": false,
+              "duration": 492,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "this.timeout(5000);\nlet cite = await fetch('http://localhost:3000/api/ccdrs/repos?ccdrs=r3d100011291', {method:'GET'});\nlet response =  await cite.json();\nexpect(response.data).to.contain.all.keys('data');\nexpect(response.data.data).to.have.lengthOf.at.most(25);\nexpect(response.data.data[0]).to.contain.all.keys('created', 'name', 'description', 'id', 'url', 'ccdrs');",
+              "err": {},
+              "uuid": "310bfcdc-7b1a-4b91-9167-3d88aaf04c8a",
+              "parentUUID": "40f48b56-87ba-4ef9-a7f0-43d8a1c5ad98",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Returns databases associated with particular keyword sets:",
+              "fullTitle": "keyword_search.vue calls: Returns databases associated with particular keyword sets:",
+              "timedOut": false,
+              "duration": 639,
+              "state": "passed",
+              "speed": "medium",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "this.timeout(5000);\nlet cite = await fetch('http://localhost:3000/api/keywords/ccdrs?keywords=climate,soil&limit=1000', {method:'GET'});\nlet response =  await cite.json();\nexpect(response.data).to.contain.all.keys('data');\nexpect(response.data.data).to.have.lengthOf.at.most(1000);\nexpect(response.data.data[0]).to.contain.all.keys('created', 'name', 'description', 'id', 'url', 'keywords');\nexpect(response.data.data[0].keywords).to.contain.any.members(['climate', 'soil']);",
+              "err": {},
+              "uuid": "a964565d-6b0e-4697-bcd7-34a7c4e2dea6",
+              "parentUUID": "40f48b56-87ba-4ef9-a7f0-43d8a1c5ad98",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "9e77c717-b74a-404a-bd81-2a7d29008629",
+            "8ae0cbb2-f2b9-411f-8eec-7f82c4c235c1",
+            "310bfcdc-7b1a-4b91-9167-3d88aaf04c8a",
+            "a964565d-6b0e-4697-bcd7-34a7c4e2dea6"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 6362,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 5000
+        },
+        {
+          "uuid": "b4227690-fc31-4f5d-a0df-5be158d07832",
+          "title": "tests for /keyword/dbs/count",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keyword-dbs-count-test.js",
+          "file": "/test/keyword-dbs-count-test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "b21f7e96-37a7-45a9-a944-8c8e8aa1edca",
+              "title": "tests for get",
+              "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keyword-dbs-count-test.js",
+              "file": "/test/keyword-dbs-count-test.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [
+                {
+                  "title": "should respond 200 for \"search results matching criteria\"",
+                  "fullTitle": "tests for /keyword/dbs/count tests for get should respond 200 for \"search results matching criteria\"",
+                  "timedOut": false,
+                  "duration": 19,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keyword/dbs/count', { \n    'qs': {\"keyword\":\"pariatur\"},\n    'time': true\n});\nexpect(response).to.have.status(200);\nreturn chakram.wait();",
+                  "err": {},
+                  "uuid": "4242ac06-b9f2-4148-9c91-83eed4b548b5",
+                  "parentUUID": "b21f7e96-37a7-45a9-a944-8c8e8aa1edca",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should respond 400 for \"bad input parameter\"",
+                  "fullTitle": "tests for /keyword/dbs/count tests for get should respond 400 for \"bad input parameter\"",
+                  "timedOut": false,
+                  "duration": 12,
+                  "state": "failed",
+                  "speed": null,
+                  "pass": false,
+                  "fail": true,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keyword/dbs/count', { \n    'qs': {\"keyword\":\"pariatur fugiat\"},\n    'time': true\n});\nexpect(response).to.have.status(400);\nreturn chakram.wait();",
+                  "err": {
+                    "message": "AssertionError: expected status code 200 to equal 400",
+                    "estack": "AssertionError: expected status code 200 to equal 400",
+                    "diff": null
+                  },
+                  "uuid": "0b9ef56b-c3f7-42ee-b09e-6ad03466f5da",
+                  "parentUUID": "b21f7e96-37a7-45a9-a944-8c8e8aa1edca",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "4242ac06-b9f2-4148-9c91-83eed4b548b5"
+              ],
+              "failures": [
+                "0b9ef56b-c3f7-42ee-b09e-6ad03466f5da"
+              ],
+              "pending": [],
+              "skipped": [],
+              "duration": 31,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 30000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 30000
+        },
+        {
+          "uuid": "255f3e65-1e58-4e52-8856-5123534c743f",
+          "title": "tests for /keyword/repos",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keyword-repos-test.js",
+          "file": "/test/keyword-repos-test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "0e7e6c6f-00c6-440c-9e9d-86ae23642f54",
+              "title": "tests for get",
+              "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keyword-repos-test.js",
+              "file": "/test/keyword-repos-test.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [
+                {
+                  "title": "should respond 200 for \"keywords matching the search criteria.\"",
+                  "fullTitle": "tests for /keyword/repos tests for get should respond 200 for \"keywords matching the search criteria.\"",
+                  "timedOut": false,
+                  "duration": 16,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keyword/repos', { \n    'time': true\n});\nexpect(response).to.have.status(200);\nreturn chakram.wait();",
+                  "err": {},
+                  "uuid": "e7e00a6d-d878-4174-971b-99913bd7d8c4",
+                  "parentUUID": "0e7e6c6f-00c6-440c-9e9d-86ae23642f54",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should respond 400 for \"bad input parameter\"",
+                  "fullTitle": "tests for /keyword/repos tests for get should respond 400 for \"bad input parameter\"",
+                  "timedOut": false,
+                  "duration": 10,
+                  "state": "failed",
+                  "speed": null,
+                  "pass": false,
+                  "fail": true,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keyword/repos', { \n    'time': true\n});\nexpect(response).to.have.status(400);\nreturn chakram.wait();",
+                  "err": {
+                    "message": "AssertionError: expected status code 200 to equal 400",
+                    "estack": "AssertionError: expected status code 200 to equal 400",
+                    "diff": null
+                  },
+                  "uuid": "5c24c133-3fde-4d47-816d-2f53c9deb844",
+                  "parentUUID": "0e7e6c6f-00c6-440c-9e9d-86ae23642f54",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "e7e00a6d-d878-4174-971b-99913bd7d8c4"
+              ],
+              "failures": [
+                "5c24c133-3fde-4d47-816d-2f53c9deb844"
+              ],
+              "pending": [],
+              "skipped": [],
+              "duration": 26,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 30000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 30000
+        },
+        {
+          "uuid": "81cb65e7-8f8f-40a7-951a-daf5e373fc8f",
+          "title": "tests for /keyword/resources",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keyword-resources-test.js",
+          "file": "/test/keyword-resources-test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "305e427e-d4e7-4b7e-956e-0a6817679ad6",
+              "title": "tests for get",
+              "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keyword-resources-test.js",
+              "file": "/test/keyword-resources-test.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [
+                {
+                  "title": "should respond 200 for \"search results matching criteria\"",
+                  "fullTitle": "tests for /keyword/resources tests for get should respond 200 for \"search results matching criteria\"",
+                  "timedOut": false,
+                  "duration": 10,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keyword/resources', { \n    'qs': {\"keyword\":\"tempor\",\"limit\":28,\"offset\":38539862},\n    'time': true\n});\nexpect(response).to.have.status(200);\nreturn chakram.wait();",
+                  "err": {},
+                  "uuid": "ced67ed4-c846-4c7e-a9f8-ad8a77d59d42",
+                  "parentUUID": "305e427e-d4e7-4b7e-956e-0a6817679ad6",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should respond 400 for \"bad input parameter\"",
+                  "fullTitle": "tests for /keyword/resources tests for get should respond 400 for \"bad input parameter\"",
+                  "timedOut": false,
+                  "duration": 11,
+                  "state": "failed",
+                  "speed": null,
+                  "pass": false,
+                  "fail": true,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keyword/resources', { \n    'qs': {\"keyword\":\"deserunt in officia ut veniam\",\"limit\":22,\"offset\":28491289},\n    'time': true\n});\nexpect(response).to.have.status(400);\nreturn chakram.wait();",
+                  "err": {
+                    "message": "AssertionError: expected status code 200 to equal 400",
+                    "estack": "AssertionError: expected status code 200 to equal 400",
+                    "diff": null
+                  },
+                  "uuid": "03558799-ab76-4702-9027-8ea846fb1757",
+                  "parentUUID": "305e427e-d4e7-4b7e-956e-0a6817679ad6",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "ced67ed4-c846-4c7e-a9f8-ad8a77d59d42"
+              ],
+              "failures": [
+                "03558799-ab76-4702-9027-8ea846fb1757"
+              ],
+              "pending": [],
+              "skipped": [],
+              "duration": 21,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 30000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 30000
+        },
+        {
+          "uuid": "da85f9fe-f131-49d1-b190-eebb25bd549a",
+          "title": "tests for /keywords",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keywords-test.js",
+          "file": "/test/keywords-test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "e7addb68-fc20-4c52-a40a-6e89eb95f550",
+              "title": "tests for get",
+              "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/keywords-test.js",
+              "file": "/test/keywords-test.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [
+                {
+                  "title": "should respond 200 for \"keywords matching the search criteria.\"",
+                  "fullTitle": "tests for /keywords tests for get should respond 200 for \"keywords matching the search criteria.\"",
+                  "timedOut": false,
+                  "duration": 12,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keywords', { \n    'qs': {\"keyword\":\"ad do ipsum dolor\",\"limit\":19,\"offset\":55572599},\n    'time': true\n});\nexpect(response).to.have.status(200);\nreturn chakram.wait();",
+                  "err": {},
+                  "uuid": "fd0d0fa9-aad7-4e41-ab48-6d587377938c",
+                  "parentUUID": "e7addb68-fc20-4c52-a40a-6e89eb95f550",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should respond 400 for \"bad input parameter\"",
+                  "fullTitle": "tests for /keywords tests for get should respond 400 for \"bad input parameter\"",
+                  "timedOut": false,
+                  "duration": 13,
+                  "state": "failed",
+                  "speed": null,
+                  "pass": false,
+                  "fail": true,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/keywords', { \n    'qs': {\"keyword\":\"est cillum ut\",\"limit\":38,\"offset\":31522623},\n    'time': true\n});\nexpect(response).to.have.status(400);\nreturn chakram.wait();",
+                  "err": {
+                    "message": "AssertionError: expected status code 200 to equal 400",
+                    "estack": "AssertionError: expected status code 200 to equal 400",
+                    "diff": null
+                  },
+                  "uuid": "156aa6fd-20f2-4931-8fec-15ae4a5c13ae",
+                  "parentUUID": "e7addb68-fc20-4c52-a40a-6e89eb95f550",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "fd0d0fa9-aad7-4e41-ab48-6d587377938c"
+              ],
+              "failures": [
+                "156aa6fd-20f2-4931-8fec-15ae4a5c13ae"
+              ],
+              "pending": [],
+              "skipped": [],
+              "duration": 25,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 30000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 30000
+        },
+        {
+          "uuid": "fd722590-ebe8-4eb0-9920-b3c8d681a747",
+          "title": "tests for /metrics/annos",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/metrics-annos-test.js",
+          "file": "/test/metrics-annos-test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "6be488f3-ba0e-4caa-8acd-23c8f7806695",
+              "title": "tests for get",
+              "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/metrics-annos-test.js",
+              "file": "/test/metrics-annos-test.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [
+                {
+                  "title": "should respond 200 for \"Summary of weekly uploads/updates.\"",
+                  "fullTitle": "tests for /metrics/annos tests for get should respond 200 for \"Summary of weekly uploads/updates.\"",
+                  "timedOut": false,
+                  "duration": 10,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/metrics/annos', { \n    'time': true\n});\nexpect(response).to.have.status(200);\nreturn chakram.wait();",
+                  "err": {},
+                  "uuid": "d44996a5-5de2-4e71-85d0-14635786ab05",
+                  "parentUUID": "6be488f3-ba0e-4caa-8acd-23c8f7806695",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should respond 400 for \"bad input parameter\"",
+                  "fullTitle": "tests for /metrics/annos tests for get should respond 400 for \"bad input parameter\"",
+                  "timedOut": false,
+                  "duration": 10,
+                  "state": "failed",
+                  "speed": null,
+                  "pass": false,
+                  "fail": true,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/metrics/annos', { \n    'time': true\n});\nexpect(response).to.have.status(400);\nreturn chakram.wait();",
+                  "err": {
+                    "message": "AssertionError: expected status code 200 to equal 400",
+                    "estack": "AssertionError: expected status code 200 to equal 400",
+                    "diff": null
+                  },
+                  "uuid": "5d2edad0-dcc2-4144-87cd-9d2498c483d8",
+                  "parentUUID": "6be488f3-ba0e-4caa-8acd-23c8f7806695",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "d44996a5-5de2-4e71-85d0-14635786ab05"
+              ],
+              "failures": [
+                "5d2edad0-dcc2-4144-87cd-9d2498c483d8"
+              ],
+              "pending": [],
+              "skipped": [],
+              "duration": 20,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 30000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 30000
+        },
+        {
+          "uuid": "6d5311e5-00ec-4b11-b3f5-a7fb14585e58",
+          "title": "tests for /repo",
+          "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/repo-test.js",
+          "file": "/test/repo-test.js",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [],
+          "suites": [
+            {
+              "uuid": "d65bd394-14a3-4dee-bf65-feb570049870",
+              "title": "tests for get",
+              "fullFile": "/home/simon/Documents/Throughput/throughput_api/test/repo-test.js",
+              "file": "/test/repo-test.js",
+              "beforeHooks": [],
+              "afterHooks": [],
+              "tests": [
+                {
+                  "title": "should respond 200 for \"search results matching criteria\"",
+                  "fullTitle": "tests for /repo tests for get should respond 200 for \"search results matching criteria\"",
+                  "timedOut": false,
+                  "duration": 11,
+                  "state": "passed",
+                  "speed": "fast",
+                  "pass": true,
+                  "fail": false,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/repo', { \n    'qs': {\"name\":\"dolor adipisicing dolore ex\",\"search\":\"sit dolore anim\",\"keyword\":\"non reprehenderit dolore mollit tempor\",\"limit\":31,\"offset\":79596129},\n    'time': true\n});\nexpect(response).to.have.status(200);\nreturn chakram.wait();",
+                  "err": {},
+                  "uuid": "a858f7ab-2b24-4d2e-b9bd-c82addbed645",
+                  "parentUUID": "d65bd394-14a3-4dee-bf65-feb570049870",
+                  "isHook": false,
+                  "skipped": false
+                },
+                {
+                  "title": "should respond 400 for \"bad input parameter\"",
+                  "fullTitle": "tests for /repo tests for get should respond 400 for \"bad input parameter\"",
+                  "timedOut": false,
+                  "duration": 13,
+                  "state": "failed",
+                  "speed": null,
+                  "pass": false,
+                  "fail": true,
+                  "pending": false,
+                  "context": null,
+                  "code": "var response = request('get', 'http://localhost:3000/repo', { \n    'qs': {\"name\":\"enim veniam consequat mollit cillum\",\"search\":\"ut minim exercitation adipisicing mollit\",\"keyword\":\"dolore anim aute mollit\",\"limit\":9,\"offset\":82743202},\n    'time': true\n});\nexpect(response).to.have.status(400);\nreturn chakram.wait();",
+                  "err": {
+                    "message": "AssertionError: expected status code 200 to equal 400",
+                    "estack": "AssertionError: expected status code 200 to equal 400",
+                    "diff": null
+                  },
+                  "uuid": "5ae2d566-84c0-4467-a887-d029377d6862",
+                  "parentUUID": "d65bd394-14a3-4dee-bf65-feb570049870",
+                  "isHook": false,
+                  "skipped": false
+                }
+              ],
+              "suites": [],
+              "passes": [
+                "a858f7ab-2b24-4d2e-b9bd-c82addbed645"
+              ],
+              "failures": [
+                "5ae2d566-84c0-4467-a887-d029377d6862"
+              ],
+              "pending": [],
+              "skipped": [],
+              "duration": 24,
+              "root": false,
+              "rootEmpty": false,
+              "_timeout": 30000
+            }
+          ],
+          "passes": [],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 0,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 30000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 30000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "6.2.3"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "tests",
+        "saveHtml": true,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "6.2.2"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "public",
+        "reportFilename": "tests"
+      },
+      "version": "5.2.0"
+    }
+  }
+}
