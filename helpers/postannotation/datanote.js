@@ -102,7 +102,6 @@ function datanote(req, res) {
   const dbtoken = checkdb(req, res)
 
   input['orcid'] = token['orcid']['sub'];
-  input['orcid'] = 1234;
 
   // Otherwise continue on:
   const fullPath = path.join(__dirname, 'cql/agent_post.cql');
