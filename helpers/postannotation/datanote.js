@@ -13,112 +13,135 @@ const dotenv = require('dotenv');
 
 dotenv.config()
 
-var pwbin = require('./../../pwbin.json')
+var pwbin = require('./../../pwbin.json');
+const { token } = require('morgan');
 
 // Create Driver
 const driver = new neo4j.driver(pwbin.host,
   neo4j.auth.basic(pwbin.user, pwbin.password), {
     disableLosslessIntegers: true
   });
-const session = driver.session();
-
-function cleanStats(result) {
-  stats = result['summary']['counters']['_stats']
-  output = Object.keys(stats)
-    .filter(x => stats[x] > 0)
-    .reduce((obj, key) => {
-      obj[key] = stats[key];
-      return obj;
-    }, {});
-  return output;
-}
 
 function checktptoken(req, res) {
 
-  const authHeader = req.headers['authorization'].split(' ');
-
-  const verified = jwt.verify(token=authHeader[1], 
-    secretOrPublicKey=process.env.TOKEN_SECRET,
-    function(err, decoded) {
-      if (err) {
-        var dummy = 1;
-      }
-    })
-
-  if (verified === undefined) {
-    res.status(401)
+  console.log(req.header('Authorization'))
+  const verified = jwt.verify(req.header('Authorization'),
+    process.env.TOKEN_SECRET,
+    function (err, decoded) {
+      res.status(403)
         .json({
           status: 'error',
-          data: null,
+          data: err,
+          token: decoded,
           message: 'You must provide a valid token as a Bearer token in the call header.'
         });
-  } else {
-    res.status(200)
-          .json({
-            status: 'success',
-            data: verified['orcid'],
-            message: 'The token works.'
-          });
-  }
+    });
+
+  return (verified);
 
 }
 
+function checkdb(req, res) {
 
-function checkdb(dbid) {
+  console.log('Checking dbid ' + req.body.dbid)
+  if (req.body.dbid === undefined) {
+    var dbid = "";
 
-  console.log('Checking dbid ' + dbid)
-  if (dbid === undefined) {
-    dbid = ""
+    // Kick out if there's no dbid set.
+    res.status(400)
+      .json({
+        status: 'error',
+        data: {
+          dbid: dbid
+        },
+        message: 'Invalid database identifier.'
+      });
+  } else {
+
+    dbid = req.body.dbid;
+    const session = driver.session();
+
+    session.run('MATCH (dc:dataCat) WHERE dc.id = $dbid \
+                 RETURN COUNT(dc) AS count', {
+        'dbid': dbid
+      })
+      .then(result => {
+        var output = result.records[0].get(0)
+        console.log(output)
+        if (output > 0) {
+          var a = 1;
+        } else {
+          res.status(400)
+            .json({
+              status: 'error',
+              data: {
+                dbid: dbid
+              },
+              message: 'Invalid database identifier.'
+            });
+        }
+      })
+      .catch(function (err) {
+        console.error(err);
+      })
+      .finally(() => session.close());
   }
-
-  output = session.run('MATCH (dc:dataCat) WHERE dc.id = $dbid RETURN COUNT(dc) AS count', {
-      'dbid': dbid
-    })
-    .then(result => {
-      output = result.records[0].get(0)
-      if (output > 0) {
-        var response = 1
-      } else {
-        response = 0
-      }
-      console.log(response)
-      return response
-    });
-  return output;
 }
 
 function datanote(req, res) {
 
-  input = {
+  var input = {
     dbid: req.body.dbid,
     additionalType: req.body.additionalType,
     id: req.body.id,
-    body: req.body.body,
-    token: req.body.token
+    body: req.body.body
   }
 
-  const token = checktoken(input.token)
+  // Token pushes out a 403 if the token isn't validated.
+  const token = checktptoken(req, res)
+  const dbtoken = checkdb(req, res)
+
+  input['orcid'] = token['orcid']['sub'];
+  input['orcid'] = 1234;
+
+  // Otherwise continue on:
+  const fullPath = path.join(__dirname, 'cql/agent_post.cql');
+  var textByLine = fs.readFileSync(fullPath).toString()
+
+  const session = driver.session();
+
+  const aa = session.run(textByLine, input)
     .then(result => {
-      if (result == 0) {
-        res.status(500)
-          .json({
-            status: 'error',
-            data: null,
-            message: 'Post does not contain a valid token in the BODY token.'
-          });
-      } else {
-        console.log('notoken')
-      }
+      const username = token['family_name'] + ', ' + token['given_name'];
+      const citeYear = new Date().getFullYear()
+      var output = { annotationid: result['records'][0]['_fields'],
+                     user: username,
+                     year: citeYear,
+                     };
+
+      res.status(200)
+        .json({
+          status: 'success',
+          data: {
+            input: input,
+            data: output
+          },
+          message: 'Added widget annotation.'
+        })
     })
-    .catch(function(err) {
-      console.error(err);
-      res.status(500)
+    .catch(function (err) {
+      res.status(400)
         .json({
           status: 'error',
-          data: err,
-          message: 'Failed to post note.'
-        });
+          data: {
+            input: input,
+            data: err
+          },
+          message: 'Everything is broken.'
+        })
     })
+    .finally(() => session.close())
+
 }
 
 module.exports.datanote = datanote;

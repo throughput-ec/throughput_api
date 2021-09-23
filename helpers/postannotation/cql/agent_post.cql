@@ -29,3 +29,4 @@ WITH a, tyb
 CREATE (ob:OBJECT { value: $body, created: timestamp()})
 CREATE (ob)-[:isType]->(tyb)
 CREATE (ob)<-[:Body]-(a)
+RETURN id(a)

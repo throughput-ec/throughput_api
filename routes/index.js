@@ -76,11 +76,6 @@ router.get('/api/ccdr/name', function(req, res) {
   ccdr.dbNameOnly(req, res);
 })
 
-router.post('/api/widget', function(req, res) {
-  var widget = require('./../helpers/postannotation/datanote.js')
-  widget.datanote(req, res)
-})
-
 router.get('/api/ccdr/linked', function(req, res) {
   var ccdr = require('./../helpers/ccdr/ccdr.js');
   ccdr.ccdrLinks(req, res);
@@ -159,5 +154,9 @@ router.post('/auth/orcid', function (req, res) {
   checktoken.checktoken(req, res);
 })
 
+router.post('/api/widget', function(req, res) {
+  var widget = require('./../helpers/postannotation/datanote.js')
+  widget.datanote(req, res)
+})
 
 module.exports = router;
