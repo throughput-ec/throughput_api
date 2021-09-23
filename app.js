@@ -1,5 +1,5 @@
 let express = require('express');
-let apicache = require('apicache');
+//let apicache = require('apicache');
 let path = require('path');
 let favicon = require('serve-favicon');
 let cookieParser = require('cookie-parser');
@@ -12,10 +12,10 @@ let swaggerUi = require('swagger-ui-express'),
   swaggerDocument = YAML.load('./throughput.yaml');
 
 let app = express();
-let cache = apicache.middleware;
+//let cache = apicache.middleware;
 
 app.use(cors({credentials: true, origin: true}))
-app.use(cache('15 minutes'));
+// app.use(cache('15 minutes'));
 
 // create a write stream (in append mode)
 let accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {
@@ -31,9 +31,9 @@ app.use(logger(':date[iso]\t:remote-addr\t:method\t:url\t:status\t:res[content-l
 const spec = path.join(__dirname, 'throughput.yaml');
 
 let routes = require('./routes/index');
-let users = require('./routes/users');
+let auth = require('./routes/auth');
 
-let debug = require('debug')('app4')
+// let debug = require('debug')('app4')
 
 let options = {
   swaggerUrl: 'https://throughputdb.com/api-docs',
@@ -56,6 +56,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/auth', auth);
 app.use('/', routes);
 
 // development error handler

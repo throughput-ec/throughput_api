@@ -38,7 +38,7 @@ function checktoken(req, res) {
           .json({
             status: 'Proxy Authentication Required',
             data: data,
-            message: 'The ORCID token passed to Throughput is not valid.'
+            message: 'The ORCID token passed to Throughput is not valid:' + token
           })
       } else {
         var tdbtoken = jwt.sign({
