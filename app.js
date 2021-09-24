@@ -56,7 +56,6 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/auth', auth);
 app.use('/', routes);
 
 // development error handler
