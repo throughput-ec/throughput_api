@@ -143,15 +143,15 @@ router.get('/api/throughputvue', function(req, res) {
   postGithub.linkRepo(req, res);
 })
 
-router.post('/api/test', function (req, res) {
-  console.log('out')
-  var checktoken = require('./../helpers/postannotation/datanote.js')
-  checktoken.checktptoken(req, res);
-})
-
 router.post('/auth/orcid', function (req, res) {
+  console.log('out')
   var checktoken = require('./../helpers/validate/checkcookie.js')
   checktoken.checktoken(req, res);
+})
+
+router.post('/api/test', function (req, res) {
+  var checktoken = require('./../helpers/postannotation/datanote.js')
+  checktoken.checktptoken(req, res);
 })
 
 router.post('/api/widget', function(req, res) {

@@ -20,7 +20,7 @@ function checktoken(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token,
-        'User-Agent': 'throughputdb-API',
+        //'User-Agent': 'throughputdb-API',
         'Accept': 'application/json'
       }
     })
