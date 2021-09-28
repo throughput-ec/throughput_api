@@ -14,7 +14,9 @@ const dotenv = require('dotenv');
 dotenv.config()
 
 var pwbin = require('./../../pwbin.json');
-const { token } = require('morgan');
+const {
+  token
+} = require('morgan');
 
 // Create Driver
 const driver = new neo4j.driver(pwbin.host,
@@ -24,61 +26,35 @@ const driver = new neo4j.driver(pwbin.host,
 
 function checktptoken(req, res) {
 
-  console.log(req.header('Authorization'))
   const verified = jwt.verify(req.header('Authorization'),
     process.env.TOKEN_SECRET,
     function (err, decoded) {
-      res.status(403)
-        .json({
-          status: 'error',
-          data: err,
-          token: decoded,
-          message: 'You must provide a valid token as a Bearer token in the call header.'
-        });
+      return (decoded)
     });
 
   return (verified);
-
 }
 
-function checkdb(req, res) {
+function checkdb(req) {
 
-  console.log('Checking dbid ' + req.body.dbid)
   if (req.body.dbid === undefined) {
     var dbid = "";
-
-    // Kick out if there's no dbid set.
-    res.status(400)
-      .json({
-        status: 'error',
-        data: {
-          dbid: dbid
-        },
-        message: 'Invalid database identifier.'
-      });
+    var output = null;
   } else {
 
     dbid = req.body.dbid;
     const session = driver.session();
 
-    session.run('MATCH (dc:dataCat) WHERE dc.id = $dbid \
-                 RETURN COUNT(dc) AS count', {
+    output = session.run('MATCH (dc:dataCat) WHERE dc.id = $dbid \
+                          RETURN properties(dc)', {
         'dbid': dbid
       })
       .then(result => {
-        var output = result.records[0].get(0)
-        console.log(output)
-        if (output > 0) {
-          var a = 1;
+        if (result.records[0].length > 0) {
+          var output = result.records[0].get(0)
+          return (output);
         } else {
-          res.status(400)
-            .json({
-              status: 'error',
-              data: {
-                dbid: dbid
-              },
-              message: 'Invalid database identifier.'
-            });
+          return (null)
         }
       })
       .catch(function (err) {
@@ -86,6 +62,7 @@ function checkdb(req, res) {
       })
       .finally(() => session.close());
   }
+  return (output)
 }
 
 function datanote(req, res) {
@@ -99,34 +76,81 @@ function datanote(req, res) {
 
   // Token pushes out a 403 if the token isn't validated.
   const token = checktptoken(req, res)
+
+  if (token === undefined) {
+    res.status(400)
+      .json({
+        status: 'failure',
+        data: {
+          input: input,
+          data: null
+        },
+        message: 'Improper token.'
+      })
+  }
+
   const dbtoken = checkdb(req, res)
-
-  input['orcid'] = token['orcid']['sub'];
-
-  // Otherwise continue on:
-  const fullPath = path.join(__dirname, 'cql/agent_post.cql');
-  var textByLine = fs.readFileSync(fullPath).toString()
-
-  const session = driver.session();
-
-  const aa = session.run(textByLine, input)
     .then(result => {
-      const username = token['family_name'] + ', ' + token['given_name'];
-      const citeYear = new Date().getFullYear()
-      var output = { annotationid: result['records'][0]['_fields'],
-                     user: username,
-                     year: citeYear,
-                     };
+      if (result === null) {
+        res.status(400)
+          .json({
+            status: 'failure',
+            data: {
+              input: input,
+              data: null
+            },
+            message: 'Improper database identifier.'
+          })
+      } else {
+        input['orcid'] = token['orcid']['sub'];
+        var outvalue = result;
 
-      res.status(200)
-        .json({
-          status: 'success',
-          data: {
-            input: input,
-            data: output
-          },
-          message: 'Added widget annotation.'
-        })
+        // Otherwise continue on:
+        const fullPath = path.join(__dirname, 'cql/agent_post.cql');
+        var textByLine = fs.readFileSync(fullPath).toString()
+
+        const session = driver.session();
+
+        session.run(textByLine, input)
+          .then(result => {
+            const username = token['orcid']['family_name'] + ', ' + token['orcid']['given_name'];
+            const citeYear = new Date().getFullYear()
+            const citeDate = new Date().toLocaleDateString("en-CA")
+            const db = 'Annotation for ' + outvalue['name'] + ', ' + input['additionalType'] + ': ' + input['id'] + '.'
+
+            var output = {
+              annotationid: result['records'][0]['_fields'],
+              user: username,
+              year: citeYear,
+              cite: db,
+              date: citeDate,
+              publisher: "Throughput Annotation Database",
+              url: "https://throughputdb.com/api/anno/" + result['records'][0]['_fields'][0]
+            };
+            
+            res.status(200)
+              .json({
+                status: 'success',
+                data: {
+                  input: input,
+                  data: output
+                },
+                message: 'Added widget annotation.'
+              })
+          })
+          .catch(function (err) {
+            res.status(400)
+              .json({
+                status: 'error',
+                data: {
+                  input: input,
+                  data: err
+                },
+                message: 'Everything is broken.'
+              })
+          })
+          .finally(() => session.close())
+      }
     })
     .catch(function (err) {
       res.status(400)
@@ -139,8 +163,6 @@ function datanote(req, res) {
           message: 'Everything is broken.'
         })
     })
-    .finally(() => session.close())
-
 }
 
 module.exports.datanote = datanote;

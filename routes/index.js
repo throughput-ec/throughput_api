@@ -3,11 +3,17 @@ var router = express.Router();
 
 var bodyParser = require("body-parser");
 
+
+router.get('/api/annotation', function(req, res) {
+  // Returns all keywords and counts of associated objects.
+  var query = require('./../helpers/keywords/keywords.js');
+  query.allkeywords(req, res);
+})
+
 // KEYWORDS
 // Keywords from keyword searches, or all keywords (with counts)
 router.get('/api/keywords', function(req, res) {
   // Returns all keywords and counts of associated objects.
-  console.log('yes')
   var query = require('./../helpers/keywords/keywords.js');
   query.allkeywords(req, res);
 })
