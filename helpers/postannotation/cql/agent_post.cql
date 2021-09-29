@@ -16,14 +16,13 @@ MERGE (ags:AGENT { id:"http://throughputdb.com/",
                   homepage: "http://throughputdb.com"})
 ON CREATE SET ags.created = timestamp()
 MERGE (ags)<-[:isAgentType]-(ats)
-MERGE (ds:OBJECT {id: $id, additionalType: $additionalType})
+MERGE (ds:OBJECT {id: $id, additionalType: $additionalType})<-[:Contains]-(db)
 MERGE (ds)-[:isType]->(dsty)
-MERGE (ds)<-[:Contains]-(db)
 WITH ds, ag, ags, tyb, mv
 CREATE (a:ANNOTATION {created: timestamp(), test: True})
 CREATE (a)-[:Target]->(ds)
-CREATE (a)-[:Generated]->(ags)
-CREATE (a)-[:Created]->(ag)
+CREATE (a)<-[:Generated]-(ags)
+CREATE (a)<-[:Created]-(ag)
 CREATE (a)-[:hasMotivation]->(mv)
 WITH a, tyb
 CREATE (ob:OBJECT { value: $body, created: timestamp()})
