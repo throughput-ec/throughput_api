@@ -12,7 +12,7 @@ MATCH (ob)<-[:Target]-(an:ANNOTATION)
 MATCH (an)-[:Body]->(n:OBJECT)
 //  WHERE (n)-[:isType]->(tyb)
 WITH DISTINCT n, an, db, ob
-MATCH (an)-[:Created]->(agt:AGENT)
+MATCH (an)<-[:Created]-(agt:AGENT)
 RETURN DISTINCT db.id AS ccdr,
   'annotation' AS object,
   'textualBody' AS type,

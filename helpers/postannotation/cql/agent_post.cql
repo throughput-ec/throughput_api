@@ -10,12 +10,12 @@ MATCH (mv:MOTIVATION {term:'describing'})
 WITH ats, agt, db, dsty, tyb, mv
 MERGE (ag:AGENT { id:$orcid })
 ON CREATE SET ag.created = timestamp()
-MERGE (ag)<-[:isAgentType]-(agt)
+MERGE (ag)-[:isAgentType]->(agt)
 MERGE (ags:AGENT { id:"http://throughputdb.com/",
                   name: "API v0.1 Annotation Widget",
                   homepage: "http://throughputdb.com"})
 ON CREATE SET ags.created = timestamp()
-MERGE (ags)<-[:isAgentType]-(ats)
+MERGE (ags)-[:isAgentType]->(ats)
 MERGE (ds:OBJECT {id: $id, additionalType: $additionalType})<-[:Contains]-(db)
 MERGE (ds)-[:isType]->(dsty)
 WITH ds, ag, ags, tyb, mv

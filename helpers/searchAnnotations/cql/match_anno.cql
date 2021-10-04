@@ -11,7 +11,7 @@ WHERE (n)-[:isType]->(tyb)
 AND ($link = '' OR n.linkid = $link)
           AND ($level = '' OR n.additionalType = $additionalType)
           WITH DISTINCT n, an, db \
-            MATCH (an)-[:Created]->(agt:AGENT) \
+            MATCH (an)<-[:Created]-(agt:AGENT) \
           RETURN DISTINCT db.id AS database, \
                  'annotation' AS element, \
                      agt.name AS author, \

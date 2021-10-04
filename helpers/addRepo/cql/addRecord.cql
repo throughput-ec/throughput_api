@@ -17,10 +17,10 @@ WITH a
 MATCH (ot:dataCat {name: $odbname})
 MERGE (ot)<-[:Target]-(a)
 MERGE (ag:AGENT { id:$agid,
-                  name: $agname}) <-[:isAgentType]-(aty)
+                  name: $agname})-[:isAgentType]->(aty)
 ON CREATE SET ag.created = timestamp()
 MERGE (ags:AGENT {name: "Throughput Code Cookbook",
-                  homepage: "https://throughputdb.com/search"})<-[:isAgentType]- (aty)
+                  homepage: "https://throughputdb.com/search"})-[:isAgentType]->(aty)
 WITH a, ag, ags
 MERGE (ag)-[:Created {created: timestamp()}]->(a)
 MERGE (ags)-[:Generated {generated: timestamp()}]->(a)
