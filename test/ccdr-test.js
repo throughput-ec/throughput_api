@@ -8,7 +8,7 @@ describe('tests for /ccdr', function() {
     describe('tests for get', function() {
         it('should respond 200 for "search results matching criteria"', function() {
             var response = request('get', 'http://localhost:3000/ccdr', { 
-                'qs': {"name":"pariatur veniam proident","search":"laboris culpa eu deserunt incididunt","keyword":"et","limit":3,"offset":60727122},
+                'qs': {"name":"irure","search":"dolore","keyword":"ea dolor ad","limit":3,"offset":82027091},
                 'time': true
             });
 
@@ -19,7 +19,7 @@ describe('tests for /ccdr', function() {
 
         it('should respond 400 for "bad input parameter"', function() {
             var response = request('get', 'http://localhost:3000/ccdr', { 
-                'qs': {"name":"ex magna","search":"cupidatat aute dolor proident","keyword":"in dolore sunt consectetur","limit":39,"offset":45685440},
+                'qs': {"name":"cillum Excepteur qui eiusmod anim","search":"ut est commodo laboris consectetur","keyword":"officia","limit":44,"offset":87750894},
                 'time': true
             });
 

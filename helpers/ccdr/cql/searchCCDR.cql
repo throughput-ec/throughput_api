@@ -3,7 +3,7 @@
 UNWIND $keywords AS kws
   CALL apoc.when(kws <> "",
     "MATCH (k:KEYWORD)
-     WHERE toLower(k.keyword) = toLower($kws)
+     WHERE toLower(k.keyword) CONTAINS(toLower($kws))
      RETURN DISTINCT k AS keywords",
     "MATCH (k:KEYWORD)
      RETURN DISTINCT k AS keywords",
@@ -14,15 +14,17 @@ CALL apoc.when($name <> "",
    WHERE toLower(o.name) CONTAINS(toLower($name))
    MATCH (o)<-[:Body]-(an:ANNOTATION)
    MATCH (kws)<-[:hasKeyword]-(an)
+   OPTIONAL MATCH (k:KEYWORD)<-[:hasKeyword]-(an)
    OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(cr:codeRepo)
-   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT kws.keyword) AS keywords, COUNT(DISTINCT cr) AS count",
-  "MATCH (kws)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o:dataCat)
-   MATCH (k)<-[:hasKeyword]-(:ANNOTATION)-[:Body]->(o)
+   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT k.keyword) AS keywords, COLLECT(DISTINCT kws.keyword) AS matchedKeywords, COUNT(DISTINCT cr) AS count",
+  "MATCH (o:dataCat)
+   MATCH (kws)<-[:hasKeyword]-(an:ANNOTATION)-[:Body]->(o)
+   OPTIONAL MATCH (k:KEYWORD)<-[:hasKeyword]-(an)
    OPTIONAL MATCH (o)<-[:Target]-(:ANNOTATION)-[:Target]->(cr:codeRepo)
-   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT k.keyword) AS keywords, COUNT(DISTINCT cr) AS count",
+   RETURN DISTINCT o AS ccdr, COLLECT(DISTINCT k.keyword) AS keywords,  COLLECT(DISTINCT kws.keyword) AS matchedKeywords, COUNT(DISTINCT cr) AS count",
    {name:$name, kws:keywords}) YIELD value AS values
-WITH values.ccdr AS ccdr, values.keywords AS keywords, values.count AS count
-RETURN DISTINCT properties(ccdr) AS ccdrs, [x IN keywords WHERE x IN $keywords] AS keywords, count
-ORDER BY SIZE(keywords) DESC, count DESC
+WITH values.ccdr AS ccdr, values.keywords AS keywords, values.matchedKeywords AS matchedKeywords, values.count AS count
+ORDER BY SIZE([x IN matchedKeywords WHERE x IN $keywords]) DESC, count DESC
+RETURN DISTINCT properties(ccdr) AS ccdrs, keywords AS keywords, count
 SKIP toInteger($offset)
 LIMIT toInteger($limit)
