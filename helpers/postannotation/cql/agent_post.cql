@@ -19,7 +19,7 @@ MERGE (ags)-[:isAgentType]->(ats)
 MERGE (ds:OBJECT {id: $id, additionalType: $additionalType})<-[:Contains]-(db)
 MERGE (ds)-[:isType]->(dsty)
 WITH ds, ag, ags, tyb, mv
-CREATE (a:ANNOTATION {created: timestamp(), test: True})
+CREATE (a:ANNOTATION {created: timestamp()})
 CREATE (a)-[:Target]->(ds)
 CREATE (a)<-[:Generated]-(ags)
 CREATE (a)<-[:Created]-(ag)

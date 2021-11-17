@@ -1,5 +1,6 @@
 let express = require('express');
 //let apicache = require('apicache');
+let compression = require('compression');
 let path = require('path');
 let favicon = require('serve-favicon');
 let cookieParser = require('cookie-parser');
@@ -40,6 +41,7 @@ let options = {
   customCssUrl: '/custom.css'
 }
 
+app.use(compression());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 // view engine setup
