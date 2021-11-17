@@ -8,7 +8,7 @@ describe('tests for /keywords', function() {
     describe('tests for get', function() {
         it('should respond 200 for "keywords matching the search criteria."', function() {
             var response = request('get', 'http://localhost:3000/keywords', { 
-                'qs': {"keyword":"ad do ipsum dolor","limit":19,"offset":55572599},
+                'qs': {"keyword":"elit","limit":43,"offset":53086281},
                 'time': true
             });
 
@@ -19,7 +19,7 @@ describe('tests for /keywords', function() {
 
         it('should respond 400 for "bad input parameter"', function() {
             var response = request('get', 'http://localhost:3000/keywords', { 
-                'qs': {"keyword":"est cillum ut","limit":38,"offset":31522623},
+                'qs': {"keyword":"ullamco","limit":13,"offset":48272157},
                 'time': true
             });
 

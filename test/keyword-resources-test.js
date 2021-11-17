@@ -8,7 +8,7 @@ describe('tests for /keyword/resources', function() {
     describe('tests for get', function() {
         it('should respond 200 for "search results matching criteria"', function() {
             var response = request('get', 'http://localhost:3000/keyword/resources', { 
-                'qs': {"keyword":"tempor","limit":28,"offset":38539862},
+                'qs': {"keyword":"Ut officia","limit":9,"offset":98596720},
                 'time': true
             });
 
@@ -19,7 +19,7 @@ describe('tests for /keyword/resources', function() {
 
         it('should respond 400 for "bad input parameter"', function() {
             var response = request('get', 'http://localhost:3000/keyword/resources', { 
-                'qs': {"keyword":"deserunt in officia ut veniam","limit":22,"offset":28491289},
+                'qs': {"keyword":"commodo","limit":1,"offset":87847551},
                 'time': true
             });
 
