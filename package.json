@@ -44,7 +44,7 @@
     "oatts": "^1.6.0",
     "octokit": "^1.6.1",
     "pug": "^3.0.2",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "serve-favicon": "^2.5.0",
     "static-favicon": "^2.0.0-alpha",
     "swagger-ui-express": "^4.1.6",
