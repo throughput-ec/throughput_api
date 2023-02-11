@@ -40,7 +40,7 @@
     "morgan": "^1.10.0",
     "neo4j-driver": "^4.3.3",
     "node-fetch": "^2.6.5",
-    "nodemon": "^2.0.13",
+    "nodemon": "^2.0.20",
     "oatts": "^1.6.0",
     "octokit": "^1.6.1",
     "pug": "^3.0.2",
