@@ -4,8 +4,8 @@ authors:
   - family-names: "Goring"
     given-names: "Simon James"
     orcid: https://orcid.org/0000-0002-2700-4605
-title: throughput-ec/throughput_api: Throughput API v1.0
+title: "Throughput Annotation Database API v1.0.0"
 version: 1.0.0
 doi: 10.5281/zenodo.7908787
 date-released: 2023-05-08
-url: https://github.com/throughput-ec/throughput_api
+url: "https://github.com/throughput-ec/throughput_api"
