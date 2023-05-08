@@ -1,4 +1,5 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental) [![NSF-1928366](https://img.shields.io/badge/NSF-1928366-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1928366)
+[![DOI](https://zenodo.org/badge/163697603.svg)](https://zenodo.org/badge/latestdoi/163697603)
 
 # Annotation Engine `neo4j` API
 
