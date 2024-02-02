@@ -8,7 +8,7 @@ describe('tests for /keyword/dbs/count', function() {
     describe('tests for get', function() {
         it('should respond 200 for "search results matching criteria"', function() {
             var response = request('get', 'http://localhost:3000/keyword/dbs/count', { 
-                'qs': {"keyword":"pariatur"},
+                'qs': {"keyword":"in Lorem elit ad"},
                 'time': true
             });
 
@@ -19,7 +19,7 @@ describe('tests for /keyword/dbs/count', function() {
 
         it('should respond 400 for "bad input parameter"', function() {
             var response = request('get', 'http://localhost:3000/keyword/dbs/count', { 
-                'qs': {"keyword":"pariatur fugiat"},
+                'qs': {"keyword":"esse"},
                 'time': true
             });
 

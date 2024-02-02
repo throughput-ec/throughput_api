@@ -10,6 +10,7 @@ var fs = require('fs');
 const path = require('path');
 var jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const { profanity } = require("super-profanity");
 
 dotenv.config()
 

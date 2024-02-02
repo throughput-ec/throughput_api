@@ -42,7 +42,7 @@ function summaryType(req, res) {
 
 function summaryTypeAgent(req, res) {
 
-  types = "MATCH (o:OBJECT)<-[:Created|Generated]-(n:AGENT)-[:isAgentType]->(t:AGENTTYPE) \
+  types = "MATCH (o:OBJECT)<-[:target]-(:ANNOTATION)<-[:Created|Generated]-(n:AGENT)-[:isAgentType]->(t:AGENTTYPE) \
              RETURN DISTINCT(t.type) AS type, COUNT(o) AS nodes"
 
   const session = driver.session();
