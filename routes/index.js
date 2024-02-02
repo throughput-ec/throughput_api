@@ -48,8 +48,8 @@ router.get('/api/keywords/ccdrs', function (req, res) {
 // Repositories by keywords.
 router.get('/api/keywords/repos', function (req, res) {
   // Returns all keywords and counts of associated objects.
-  var query = require('./../helpers/repos/coderepo.js');
-  query.searchRepo(req, res);
+  var query = require('./../helpers/keywords/keywordrepo.js');
+  query.keywordrepo(req, res);
 })
 
 router.get('/api/ccdrs/repos', function (req, res) {
